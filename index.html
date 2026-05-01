@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PT Prasad Seeds Indonesia — Accounts Receivable Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<style>
+* { box-sizing: border-box; }
+:root {
+  --slate-900: #0F172A;
+  --slate-800: #1E293B;
+  --slate-700: #334155;
+  --slate-500: #64748B;
+  --slate-400: #94A3B8;
+  --slate-200: #E2E8F0;
+  --slate-100: #F1F5F9;
+  --slate-50:  #F8FAFC;
+  --teal-600:  #0D9488;
+  --teal-500:  #14B8A6;
+  --emerald-600: #059669;
+  --emerald-100: #D1FAE5;
+  --indigo-700: #4338CA;
+  --indigo-800: #3730A3;
+  --amber-500: #F59E0B;
+  --amber-100: #FEF3C7;
+  --rose-700: #BE123C;
+  --rose-100: #FFE4E6;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+html, body {
+  margin: 0; padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--slate-50);
+  color: var(--slate-900);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+header.hero {
+  background: linear-gradient(135deg, #0F172A 0%, #1E40AF 50%, #0D9488 100%);
+  color: white;
+  padding: 36px 32px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+header.hero::before {
+  content: "";
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
+  border-radius: 50%;
+}
+header.hero h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+header.hero p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  font-weight: 500;
+}
+.brand-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.18);
+  padding: 5px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+.currency-toggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 4px;
+  z-index: 5;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.cur-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.cur-btn:hover:not(.active) {
+  color: #FFFFFF;
+}
+.cur-btn.active {
+  background: #FFFFFF;
+  color: var(--slate-900);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+.rate-note {
+  margin: 8px 0 0 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  font-style: italic;
+}
+@media (max-width: 640px) {
+  .container { padding: 16px 12px 48px; }
+  header.hero {
+    padding: 24px 20px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  header.hero h1 { font-size: 22px; }
+  .currency-toggle {
+    position: static;
+    margin: 0 0 14px 0;
+    order: -1;
+  }
+  .cur-btn { padding: 6px 12px; font-size: 11px; }
+  .kpi { padding: 18px 16px 20px; }
+  .kpi-value { font-size: 22px; }
+  .card { padding: 20px 16px 18px; border-radius: 14px; }
+  .group-title { font-size: 12px; margin: 14px 4px 8px; }
+  table.matrix { font-size: 12px; }
+  table.matrix th, table.matrix td { padding: 8px 8px; }
+}
+.group-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--slate-500);
+  margin: 18px 4px 10px 4px;
+  padding-left: 4px;
+  border-left: 4px solid var(--teal-600);
+}
+.group-title:first-of-type { margin-top: 8px; }
+.group-title span { color: var(--slate-700); text-transform: none; letter-spacing: 0; }
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.kpi {
+  background: white;
+  border-radius: 16px;
+  padding: 22px 20px 24px;
+  box-shadow: var(--shadow-md);
+  border-top: 4px solid;
+  transition: transform .18s ease, box-shadow .18s ease;
+  position: relative;
+  overflow: hidden;
+}
+.kpi:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+.kpi-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--slate-500);
+  margin-bottom: 8px;
+}
+.kpi-value {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.kpi-sub {
+  font-size: 12px;
+  color: var(--slate-500);
+  font-weight: 500;
+}
+.kpi.total    { border-top-color: var(--slate-900); }
+.kpi.tooling  { border-top-color: var(--indigo-700); }
+.kpi.rental   { border-top-color: #0891B2; }   /* cyan-600 */
+.kpi.berjalan { border-top-color: var(--teal-600); }
+.kpi.lama     { border-top-color: var(--rose-700); }
+.kpi.billing  { border-top-color: var(--emerald-600); }
+.kpi.coll     { border-top-color: var(--amber-500); }
+.kpi.coll-ytd { border-top-color: #F59E0B; }
+.kpi.coll-y1  { border-top-color: #9333EA; }   /* purple-600 */
+.kpi.coll-y2  { border-top-color: #7E22CE; }   /* purple-700 */
+.kpi.total    .kpi-value { color: var(--slate-900); }
+.kpi.tooling  .kpi-value { color: var(--indigo-700); }
+.kpi.rental   .kpi-value { color: #0891B2; }
+.kpi.berjalan .kpi-value { color: var(--teal-600); }
+.kpi.lama     .kpi-value { color: var(--rose-700); }
+.kpi.billing  .kpi-value { color: var(--emerald-600); }
+.kpi.coll     .kpi-value { color: var(--amber-500); }
+.kpi.coll-ytd .kpi-value { color: #F59E0B; }
+.kpi.coll-y1  .kpi-value { color: #9333EA; }
+.kpi.coll-y2  .kpi-value { color: #7E22CE; }
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 24px;
+}
+.card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.01em;
+}
+.card .desc {
+  font-size: 13px;
+  color: var(--slate-500);
+  margin: 0 0 18px 0;
+}
+
+table.matrix {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+table.matrix th, table.matrix td {
+  padding: 10px 12px;
+  text-align: right;
+  border-bottom: 1px solid var(--slate-100);
+}
+table.matrix th:first-child, table.matrix td:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: var(--slate-700);
+}
+table.matrix thead th {
+  background: var(--slate-100);
+  color: var(--slate-700);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--slate-200);
+}
+table.matrix tr:last-child td {
+  border-bottom: none;
+}
+table.matrix tr.total {
+  background: var(--amber-100);
+  font-weight: 700;
+}
+table.matrix tr.total td {
+  border-top: 2px solid var(--amber-500);
+}
+table.matrix td.bucket-cell {
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+tr.year-old td      { background: var(--rose-100) !important; }
+tr.year-current td  { background: var(--emerald-100) !important; }
+tr.year-paid td     { background: var(--slate-100) !important; color: var(--slate-500) !important; font-style: italic; }
+tr.year-old td:first-child,
+tr.year-current td:first-child { font-weight: 700; }
+
+td.gap-high    { background: #FEF3C7; font-weight: 700; color: #92400E; }
+td.gap-catchup { background: #D1FAE5; font-weight: 700; color: #065F46; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 960px) {
+  .section-grid.two-col { grid-template-columns: 1fr 1fr; }
+}
+
+.proj-section { margin-bottom: 22px; }
+.proj-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--teal-600);
+  margin: 0 0 8px 0;
+}
+.overdue-row {
+  background: var(--rose-100) !important;
+  color: var(--rose-700) !important;
+  font-weight: 700;
+}
+.overdue-row td { color: var(--rose-700) !important; }
+
+footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--slate-400);
+  margin-top: 32px;
+  letter-spacing: 0.04em;
+}
+.share-tip {
+  margin-top: 18px;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  font-size: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+.empty-cell { color: var(--slate-400); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="hero">
+    <div class="currency-toggle" role="tablist" aria-label="Currency">
+      <button id="btn-idr" class="cur-btn active" data-cur="IDR">Rp IDR</button>
+      <button id="btn-usd" class="cur-btn" data-cur="USD">$ USD</button>
+    </div>
+    <span class="brand-tag">PT Prasad Seeds Indonesia</span>
+    <h1>Accounts Receivable Dashboard — Daily Monitoring</h1>
+    <p id="refresh-info">Loading...</p>
+    <p class="rate-note" id="rate-note" style="display:none;">Conversion rate: 1 USD = Rp 17,000 (fixed)</p>
+  </header>
+
+  <h2 class="group-title">AR Snapshot — as of <span id="snapshot-date"></span></h2>
+  <div class="kpi-grid" id="kpi-snapshot"></div>
+
+  <h2 class="group-title">AR by Fiscal Year (Jan&ndash;Dec)</h2>
+  <div class="kpi-grid" id="kpi-periode"></div>
+
+  <h2 class="group-title">Activity &mdash; Billing &amp; Collection by Period</h2>
+  <div class="kpi-grid" id="kpi-aktivitas"></div>
+
+  <div class="card">
+    <h2>AR by Customer &times; Aging Bucket</h2>
+    <p class="desc">Outstanding balance by customer, split by aging bucket. Colors reflect risk level (green = healthy, red = critical).</p>
+    <div style="overflow-x: auto;">
+      <table class="matrix" id="aging-table"></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>AR by Fiscal Year (based on Invoice Date)</h2>
+    <p class="desc">Outstanding balance split by Invoice Date year (Jan&ndash;Dec). Green = current year, pink = balances 2+ years old still open, gray = fully paid.</p>
+    <div style="overflow-x: auto;">
+      <table class="matrix" id="year-table"></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Service Performed vs Invoiced (last 12 months)</h2>
+    <p class="desc">Service Performed = value of services completed in the month (Service Date End). Service Invoiced = value of services billed in the month (Invoice Date). Numbers shown above each bar; gap and analysis in the table below.</p>
+    <div style="position: relative; height: 380px;">
+      <canvas id="serviceChart"></canvas>
+    </div>
+    <div style="overflow-x: auto; margin-top: 18px;">
+      <table class="matrix" id="service-table"></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Daily Projected Incoming AR</h2>
+    <p class="desc">Estimated payment receipt dates based on due dates and customer payment rules (Corteva = next Thursday, others = invoice due date).</p>
+    <div id="projection"></div>
+  </div>
+
+  <footer>
+    Dashboard auto-generated from <strong>PSI AR Monitoring Master.xlsx</strong>.
+    To refresh, run <strong>Refresh Dashboard.bat</strong>.
+  </footer>
+</div>
+
+<script>
+const data = {"refreshed": "Thursday, 30 April 2026 - 17:02", "refresh_short": "30 Apr 2026", "current_year": 2026, "kpi": {"total_ar": 53672652576.74872, "tahun_berjalan": 23041018864.193752, "saldo_lama": 30631633712.554955, "tooling": 40748175803.163376, "rental": 12924476773.585339, "billing": 14047660508.727972, "billing_month": "Apr 2026", "collection": 48279467709.39907, "collection_month": "Apr 2026", "collection_ytd": 120700837024.96132, "collection_y1": 288569069004.3917, "collection_y2": 743923283.0599998}, "aging_order": ["NOT YET DUE", "0-30", "31-60", "61-90", "91-180", "181-365", ">1 year"], "aging_descriptions": {"NOT YET DUE": "Belum jatuh tempo", "0-30": "Overdue 1-30 hari", "31-60": "Overdue 31-60 hari", "61-90": "Overdue 61-90 hari", "91-180": "Overdue 91-180 hari", "181-365": "Overdue 181-365 hari", ">1 year": "Overdue > 1 tahun"}, "aging_colors": {"NOT YET DUE": "#00B050", "0-30": "#92D050", "31-60": "#FFD966", "61-90": "#F4B084", "91-180": "#ED7D31", "181-365": "#C00000", ">1 year": "#5B0E0E"}, "aging_text_colors": {"NOT YET DUE": "#FFFFFF", "0-30": "#0F172A", "31-60": "#0F172A", "61-90": "#0F172A", "91-180": "#FFFFFF", "181-365": "#FFFFFF", ">1 year": "#FFFFFF"}, "customers": ["PT Sygenta Seed Indonesia", "PT Advanta Seeds Indonesia", "PT Alam Semesta Agro", "PT Corteva Agriscience Seed Indonesia", "PT Bayer Indonesia", "Nuziveedu", "Bioseed"], "aging_rows": [{"customer": "PT Sygenta Seed Indonesia", "buckets": [12991008629.752253, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 12991008629.752253}, {"customer": "PT Advanta Seeds Indonesia", "buckets": [4343161968.051441, -152557775.3715658, 90451348.29266915, 240159315.57711712, 0.0, 0.0, 0.0], "total": 4521214856.549662}, {"customer": "PT Alam Semesta Agro", "buckets": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 0.0}, {"customer": "PT Corteva Agriscience Seed Indonesia", "buckets": [4342041732.541846, 1068248720.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 5410290452.541846}, {"customer": "PT Bayer Indonesia", "buckets": [118504925.35, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 118504925.35}, {"customer": "Nuziveedu", "buckets": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1031722365.0], "total": 1031722365.0}, {"customer": "Bioseed", "buckets": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 29599911347.554955], "total": 29599911347.554955}], "grand_total_buckets": [21794717255.69554, 915690944.6284342, 90451348.29266915, 240159315.57711712, 0.0, 0.0, 30631633712.554955], "overdue_by_cust": {"PT Sygenta Seed Indonesia": 0.0, "PT Advanta Seeds Indonesia": 178052888.4982205, "PT Alam Semesta Agro": 0.0, "PT Corteva Agriscience Seed Indonesia": 1068248720.0, "PT Bayer Indonesia": 0.0, "Nuziveedu": 1031722365.0, "Bioseed": 29599911347.554955}, "overdue_total": 31877935321.053177, "overdue_label": "April 2026", "proj_sections": [{"label": "May 2026", "rows": [{"date": "05 May 2026", "values": [1454185173.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 1454185173.0}, {"date": "07 May 2026", "values": [0.0, 938304813.4234233, 0.0, 2182914655.474, 0.0, 0.0, 0.0], "total": 3121219468.8974233}, {"date": "08 May 2026", "values": [3836652682.9945946, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 3836652682.9945946}, {"date": "11 May 2026", "values": [1870392266.8378377, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 1870392266.8378377}, {"date": "13 May 2026", "values": [0.0, 0.0, 0.0, 0.0, 75232731.95, 0.0, 0.0], "total": 75232731.95}, {"date": "16 May 2026", "values": [0.0, 0.0, 0.0, 0.0, 43272193.400000006, 0.0, 0.0], "total": 43272193.400000006}, {"date": "20 May 2026", "values": [0.0, 1850087870.6100001, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 1850087870.6100001}, {"date": "21 May 2026", "values": [0.0, 251406937.66666666, 0.0, 684766225.8141532, 0.0, 0.0, 0.0], "total": 936173163.4808198}, {"date": "24 May 2026", "values": [0.0, 1101104301.3513513, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 1101104301.3513513}, {"date": "26 May 2026", "values": [825500320.1351349, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 825500320.1351349}, {"date": "28 May 2026", "values": [0.0, 0.0, 0.0, 406112131.2536937, 0.0, 0.0, 0.0], "total": 406112131.2536937}, {"date": "30 May 2026", "values": [0.0, 202258045.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 202258045.0}], "totals": [7986730442.967567, 4343161968.051441, 0.0, 3273793012.5418468, 118504925.35000001, 0.0, 0.0], "grand_total": 15722190348.910856}, {"label": "June 2026", "rows": [{"date": "02 Jun 2026", "values": [936954398.671171, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 936954398.671171}, {"date": "04 Jun 2026", "values": [0.0, 0.0, 0.0, 1068248720.0, 0.0, 0.0, 0.0], "total": 1068248720.0}, {"date": "09 Jun 2026", "values": [2764691563.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 2764691563.8}, {"date": "13 Jun 2026", "values": [223540169.5135135, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 223540169.5135135}, {"date": "15 Jun 2026", "values": [851303739.8918917, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 851303739.8918917}, {"date": "16 Jun 2026", "values": [75268108.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 75268108.8}, {"date": "21 Jun 2026", "values": [152520206.1081081, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 152520206.1081081}], "totals": [5004278186.784684, 0.0, 0.0, 1068248720.0, 0.0, 0.0, 0.0], "grand_total": 6072526906.784684}], "service_billing": [{"month": "Jul 2025", "performed": 13978232594.40502, "invoiced": 13430086367.517927, "gap": 548146226.8870926, "pct_invoiced": 0.9607857271521941, "note": "On track"}, {"month": "Aug 2025", "performed": 48586290116.633575, "invoiced": 34733261287.44349, "gap": 13853028829.190086, "pct_invoiced": 0.7148778226134314, "note": "Partially uninvoiced"}, {"month": "Sep 2025", "performed": 68255640051.32751, "invoiced": 67971714009.00736, "gap": 283926042.32014465, "pct_invoiced": 0.9958402552213028, "note": "On track"}, {"month": "Oct 2025", "performed": 66793712354.01656, "invoiced": 63827327546.06796, "gap": 2966384807.948601, "pct_invoiced": 0.9555888615349553, "note": "On track"}, {"month": "Nov 2025", "performed": 84341043625.2289, "invoiced": 31245109766.04071, "gap": 53095933859.18819, "pct_invoiced": 0.3704615027634585, "note": "Many services uninvoiced"}, {"month": "Dec 2025", "performed": 15421312930.929237, "invoiced": 86240159201.3014, "gap": -70818846270.37216, "pct_invoiced": 5.592270877814608, "note": "Catch-up: prior-month invoices issued"}, {"month": "Jan 2026", "performed": 8563652569.072552, "invoiced": 13827779290.76451, "gap": -5264126721.691957, "pct_invoiced": 1.6147057787822032, "note": "Catch-up: prior-month invoices issued"}, {"month": "Feb 2026", "performed": 12580514283.490593, "invoiced": 10232991763.920591, "gap": 2347522519.5700016, "pct_invoiced": 0.8134001149181432, "note": "Partially uninvoiced"}, {"month": "Mar 2026", "performed": 14112508000.510155, "invoiced": 14795617887.569881, "gap": -683109887.0597267, "pct_invoiced": 1.0484045704020173, "note": "On track"}, {"month": "Apr 2026", "performed": 2742839622.216216, "invoiced": 14047660508.727972, "gap": -11304820886.511757, "pct_invoiced": 5.12157560906804, "note": "Catch-up: prior-month invoices issued"}, {"month": "Nov 2026", "performed": 30089316.45045045, "invoiced": 0, "gap": 30089316.45045045, "pct_invoiced": 0.0, "note": "Services not yet invoiced"}, {"month": "Dec 2026", "performed": 706474572.4351715, "invoiced": 0, "gap": 706474572.4351715, "pct_invoiced": 0.0, "note": "Services not yet invoiced"}], "year_rows": [{"label": "Year 2020 (Jan-Dec)", "year": 2020, "tooling": 13098981258.0, "rental": 0.0, "total": 13098981258.0, "tag": "old"}, {"label": "Year 2021 (Jan-Dec)", "year": 2021, "tooling": 8122709353.000001, "rental": 0.0, "total": 8122709353.000001, "tag": "old"}, {"label": "Year 2022 (Jan-Dec)", "year": 2022, "tooling": 3086407758.0, "rental": 0.0, "total": 3086407758.0, "tag": "old"}, {"label": "Year 2023 (Jan-Dec)", "year": 2023, "tooling": 3003330758.6, "rental": 0.0, "total": 3003330758.6, "tag": "old"}, {"label": "Year 2024 (Jan-Dec)", "year": 2024, "tooling": 3320204584.9549556, "rental": 0.0, "total": 3320204584.9549556, "tag": "old"}, {"label": "Year 2025 (Jan-Dec) — Fully Paid", "year": 2025, "tooling": 0.0, "rental": 0.0, "total": 0.0, "tag": "paid"}, {"label": "Year 2026 (Jan-Dec)", "year": 2026, "tooling": 10116542090.608423, "rental": 12924476773.585339, "total": 23041018864.193764, "tag": "current"}], "year_grand_total": {"tooling": 40748175803.163376, "rental": 12924476773.585339, "total": 53672652576.74872}};
+
+// Currency state and conversion
+const USD_RATE = 17000;   // 1 USD = Rp 17,000 (fixed)
+let CURRENCY = 'IDR';     // toggled via UI
+
+// Format short with English suffixes; auto-converts to USD when CURRENCY === 'USD'
+function fmtRp(v) {
+  if (v === null || v === undefined || v === 0) return "—";
+  const sign = v < 0 ? '-' : '';
+  if (CURRENCY === 'USD') {
+    const u = Math.abs(v) / USD_RATE;
+    let formatted;
+    if (u >= 1e6) formatted = (u / 1e6).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' Million';
+    else if (u >= 1e3) formatted = (u / 1e3).toLocaleString('en-US', { maximumFractionDigits: 1 }) + ' Thousand';
+    else formatted = u.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    return sign + '$' + formatted;
+  }
+  const abs = Math.abs(v);
+  let formatted;
+  if (abs >= 1e9) formatted = (abs / 1e9).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' Billion';
+  else if (abs >= 1e6) formatted = (abs / 1e6).toLocaleString('en-US', { maximumFractionDigits: 1 }) + ' Million';
+  else formatted = abs.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  return sign + 'Rp ' + formatted;
+}
+function fmtRpFull(v) {
+  if (v === null || v === undefined) return '—';
+  const sign = v < 0 ? '-' : '';
+  if (CURRENCY === 'USD') {
+    const u = Math.abs(v) / USD_RATE;
+    return sign + '$' + u.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  return sign + 'Rp ' + Math.round(Math.abs(v)).toLocaleString('en-US');
+}
+
+// ---------------- KPI cards ----------------
+const cy = data.current_year;
+document.getElementById('snapshot-date').textContent = data.refresh_short;
+
+function getKpiGroups() {
+  return {
+    'kpi-snapshot': [
+      { cls: 'total',    label: 'Total AR',   value: data.kpi.total_ar,
+        sub: 'AR Tooling + AR Rental, as of ' + data.refresh_short },
+      { cls: 'tooling',  label: 'AR Tooling', value: data.kpi.tooling,
+        sub: 'Processing & Handling, as of ' + data.refresh_short },
+      { cls: 'rental',   label: 'AR Rental',  value: data.kpi.rental,
+        sub: 'Cold Storage, Ambient, Office & Lab, as of ' + data.refresh_short },
+    ],
+    'kpi-periode': [
+      { cls: 'berjalan', label: 'AR ' + cy + ' (Current Year)', value: data.kpi.tahun_berjalan,
+        sub: 'Invoices issued in ' + cy },
+      { cls: 'lama',     label: 'AR Legacy (pre-' + cy + ')', value: data.kpi.saldo_lama,
+        sub: 'Invoices from prior years still open (require follow-up)' },
+    ],
+    'kpi-aktivitas': [
+      { cls: 'billing',  label: 'Billing ' + data.kpi.billing_month, value: data.kpi.billing,
+        sub: 'Invoices issued in ' + data.kpi.billing_month + ' only' },
+      { cls: 'coll',     label: 'Collection ' + data.kpi.collection_month, value: data.kpi.collection,
+        sub: 'Payments received in ' + data.kpi.collection_month + ' only' },
+      { cls: 'coll-ytd', label: 'Collection YTD ' + cy, value: data.kpi.collection_ytd,
+        sub: 'Cumulative Jan – ' + data.refresh_short },
+      { cls: 'coll-y1',  label: 'Collection ' + (cy - 1) + ' (Jan-Dec)', value: data.kpi.collection_y1,
+        sub: 'Full-year payments for ' + (cy - 1) },
+      { cls: 'coll-y2',  label: 'Collection ' + (cy - 2) + ' (Jan-Dec)', value: data.kpi.collection_y2,
+        sub: 'Full-year payments for ' + (cy - 2) },
+    ],
+  };
+}
+
+function renderKPIs() {
+  const groups = getKpiGroups();
+  Object.entries(groups).forEach(([gridId, specs]) => {
+    const grid = document.getElementById(gridId);
+    grid.innerHTML = '';
+    specs.forEach(k => {
+      const div = document.createElement('div');
+      div.className = 'kpi ' + k.cls;
+      div.innerHTML =
+        '<div class="kpi-label">' + k.label + '</div>' +
+        '<div class="kpi-value">' + fmtRp(k.value) + '</div>' +
+        '<div class="kpi-sub" title="' + fmtRpFull(k.value) + '">' + k.sub + '</div>';
+      grid.appendChild(div);
+    });
+  });
+}
+
+// ---------------- Aging matrix ----------------
+function renderAgingTable() {
+  const agingTable = document.getElementById('aging-table');
+  const buckets = data.aging_order;
+  const colors = data.aging_colors;
+  const textColors = data.aging_text_colors;
+
+  let thead = '<thead><tr><th>Customer</th>';
+  buckets.forEach(b => { thead += `<th>${b}</th>`; });
+  thead += '<th>Total</th></tr></thead>';
+
+  let tbody = '<tbody>';
+  data.aging_rows.forEach(row => {
+    tbody += `<tr><td>${row.customer}</td>`;
+    row.buckets.forEach((v, i) => {
+      const b = buckets[i];
+      if (v === 0) {
+        tbody += `<td class="empty-cell">—</td>`;
+      } else {
+        tbody += `<td class="bucket-cell" style="background:${colors[b]};color:${textColors[b]};" title="${b}: ${fmtRpFull(v)}">${fmtRp(v)}</td>`;
+      }
+    });
+    tbody += `<td><strong>${fmtRp(row.total)}</strong></td></tr>`;
+  });
+  tbody += '<tr class="total"><td>Grand Total</td>';
+  data.grand_total_buckets.forEach(v => {
+    tbody += `<td>${fmtRp(v)}</td>`;
+  });
+  const grand = data.grand_total_buckets.reduce((a, b) => a + b, 0);
+  tbody += `<td>${fmtRp(grand)}</td></tr>`;
+  tbody += '</tbody>';
+  agingTable.innerHTML = thead + tbody;
+}
+
+// ---------------- Year breakdown ----------------
+function renderYearTable() {
+  const yearTable = document.getElementById('year-table');
+  let yhead = '<thead><tr><th>Invoice Year</th><th>AR Tooling</th><th>AR Rental</th><th>Total</th></tr></thead>';
+  let ybody = '<tbody>';
+  data.year_rows.forEach(row => {
+    const cls = row.tag === 'old' ? 'year-old'
+              : row.tag === 'current' ? 'year-current'
+              : row.tag === 'paid' ? 'year-paid' : '';
+    ybody += `<tr class="${cls}">`;
+    ybody += `<td>${row.label}</td>`;
+    ybody += `<td>${fmtRp(row.tooling)}</td>`;
+    ybody += `<td>${fmtRp(row.rental)}</td>`;
+    ybody += `<td><strong>${fmtRp(row.total)}</strong></td>`;
+    ybody += '</tr>';
+  });
+  const yg = data.year_grand_total;
+  ybody += `<tr class="total"><td>TOTAL</td><td>${fmtRp(yg.tooling)}</td><td>${fmtRp(yg.rental)}</td><td>${fmtRp(yg.total)}</td></tr>`;
+  ybody += '</tbody>';
+  yearTable.innerHTML = yhead + ybody;
+}
+
+// ---------------- Service & Billing chart ----------------
+// Custom plugin to draw the gap (Performed - Invoiced) above each pair of bars
+const gapLabelPlugin = {
+  id: 'gapLabel',
+  afterDatasetsDraw(chart) {
+    const { ctx, scales } = chart;
+    const meta0 = chart.getDatasetMeta(0);
+    const meta1 = chart.getDatasetMeta(1);
+    if (!meta0 || !meta1) return;
+    ctx.save();
+    ctx.font = "700 11px Inter, sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    chart.data.labels.forEach((_, i) => {
+      const b0 = meta0.data[i];
+      const b1 = meta1.data[i];
+      if (!b0 || !b1) return;
+      const gap = data.service_billing[i].gap;
+      const x = (b0.x + b1.x) / 2;
+      const y = Math.min(b0.y, b1.y) - 22;  // above the taller bar
+      const isPositive = gap > 0;
+      const isNegative = gap < 0;
+      const color = isPositive ? '#D97706' : (isNegative ? '#059669' : '#64748B');
+      // background pill
+      const text = 'Gap: ' + fmtRp(gap);
+      const textWidth = ctx.measureText(text).width;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      const padX = 6, h = 16, w = textWidth + padX * 2;
+      // Use roundRect if available (modern browsers), else plain rect
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(x - w / 2, y - h, w, h, 8);
+      } else {
+        ctx.rect(x - w / 2, y - h, w, h);
+      }
+      ctx.fill();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(text, x, y - 3);
+    });
+    ctx.restore();
+  }
+};
+
+let serviceChart = null;
+function initChart() {
+  if (typeof Chart === 'undefined') {
+    // Chart.js failed to load (often happens in iOS Files / Drive preview).
+    // Show fallback message instead of breaking the page.
+    const wrap = document.getElementById('serviceChart').parentElement;
+    wrap.innerHTML = '<div style="padding:24px;background:var(--slate-50);border-radius:12px;text-align:center;color:var(--slate-500);font-size:13px;">' +
+      '<strong style="color:var(--slate-700);">Chart not available in this preview.</strong><br>' +
+      'Please open in a full browser (Safari, Chrome) to see the bar chart.<br>' +
+      'The data is still available in the table below.</div>';
+    return;
+  }
+  if (typeof ChartDataLabels !== 'undefined') {
+    Chart.register(ChartDataLabels);
+  }
+  const ctx = document.getElementById('serviceChart').getContext('2d');
+  serviceChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: data.service_billing.map(d => d.month),
+    datasets: [
+      {
+        label: 'Service Performed',
+        data: data.service_billing.map(d => d.performed),
+        backgroundColor: '#0F172A',
+        borderRadius: 6,
+      },
+      {
+        label: 'Service Invoiced',
+        data: data.service_billing.map(d => d.invoiced),
+        backgroundColor: '#0D9488',
+        borderRadius: 6,
+      },
+    ],
+  },
+    plugins: (typeof ChartDataLabels !== 'undefined') ? [ChartDataLabels, gapLabelPlugin] : [gapLabelPlugin],
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 32 } },
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Inter', size: 12, weight: '600' } } },
+        tooltip: {
+          callbacks: {
+            label: (c) => c.dataset.label + ': ' + fmtRpFull(c.parsed.y),
+            afterBody: (items) => {
+              if (items.length === 0) return '';
+              const i = items[0].dataIndex;
+              const d = data.service_billing[i];
+              return ['', 'Gap: ' + fmtRpFull(d.gap),
+                      '% Invoiced: ' + (d.pct_invoiced * 100).toFixed(1) + '%',
+                      'Note: ' + d.note];
+            },
+          },
+          backgroundColor: '#0F172A',
+          titleFont: { family: 'Inter', weight: '700' },
+          bodyFont: { family: 'Inter' },
+          padding: 12,
+        },
+        datalabels: {
+          anchor: 'end',
+          align: 'end',
+          offset: 2,
+          font: { family: 'Inter', size: 10, weight: '700' },
+          color: (c) => c.datasetIndex === 0 ? '#0F172A' : '#0D9488',
+          formatter: (v) => fmtRp(v),
+        },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } },
+        y: {
+          beginAtZero: true,
+          grid: { color: '#F1F5F9' },
+          ticks: {
+            font: { family: 'Inter' },
+            callback: (v) => fmtRp(v),
+          },
+        },
+      },
+    },
+  });
+}  // end initChart()
+
+// ---------------- Service & Billing data table (under chart) ----------------
+function renderServiceTable() {
+  const svcTable = document.getElementById('service-table');
+  let shead = '<thead><tr><th>Month</th><th>Service Performed</th><th>Service Invoiced</th><th>Gap</th><th>% Invoiced</th><th>Note</th></tr></thead>';
+  let sbody = '<tbody>';
+  data.service_billing.forEach(row => {
+    let gapClass = '';
+    if (row.gap > 100000000) gapClass = 'gap-high';
+    else if (row.gap < -100000000) gapClass = 'gap-catchup';
+    sbody += `<tr>`;
+    sbody += `<td><strong>${row.month}</strong></td>`;
+    sbody += `<td>${fmtRp(row.performed)}</td>`;
+    sbody += `<td>${fmtRp(row.invoiced)}</td>`;
+    sbody += `<td class="${gapClass}">${fmtRp(row.gap)}</td>`;
+    sbody += `<td>${(row.pct_invoiced * 100).toFixed(1)}%</td>`;
+    sbody += `<td><em>${row.note}</em></td>`;
+    sbody += '</tr>';
+  });
+  const totPerf = data.service_billing.reduce((a, r) => a + r.performed, 0);
+  const totInv = data.service_billing.reduce((a, r) => a + r.invoiced, 0);
+  const totGap = totPerf - totInv;
+  const totPct = totPerf > 0 ? totInv / totPerf : 0;
+  sbody += `<tr class="total"><td>TOTAL</td><td>${fmtRp(totPerf)}</td><td>${fmtRp(totInv)}</td><td>${fmtRp(totGap)}</td><td>${(totPct * 100).toFixed(1)}%</td><td></td></tr>`;
+  sbody += '</tbody>';
+  svcTable.innerHTML = shead + sbody;
+}
+
+// ---------------- Projection sections ----------------
+const customers = data.customers;
+
+function buildProjTable(customers, sectionRows, totals, grandTotal, overdueRow) {
+  let html = '<div style="overflow-x:auto;"><table class="matrix">';
+  html += '<thead><tr><th>Date</th>';
+  customers.forEach(c => { html += `<th>${c}</th>`; });
+  html += '<th>Total</th></tr></thead><tbody>';
+
+  if (overdueRow) {
+    html += `<tr class="overdue-row"><td>Balance Outstanding ${data.overdue_label}</td>`;
+    customers.forEach(c => {
+      html += `<td>${fmtRp(overdueRow[c] || 0)}</td>`;
+    });
+    html += `<td>${fmtRp(data.overdue_total)}</td></tr>`;
+  }
+
+  sectionRows.forEach(row => {
+    html += `<tr><td>${row.date}</td>`;
+    row.values.forEach(v => {
+      html += `<td>${v ? fmtRp(v) : '<span class="empty-cell">—</span>'}</td>`;
+    });
+    html += `<td><strong>${fmtRp(row.total)}</strong></td></tr>`;
+  });
+
+  if (totals) {
+    html += '<tr class="total"><td>Total upcoming</td>';
+    totals.forEach(v => { html += `<td>${fmtRp(v)}</td>`; });
+    html += `<td>${fmtRp(grandTotal)}</td></tr>`;
+  }
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function renderProjection() {
+  const projDiv = document.getElementById('projection');
+  projDiv.innerHTML = '';
+  if (data.proj_sections.length === 0 && data.overdue_total === 0) {
+    projDiv.innerHTML = '<p style="color:var(--slate-500);">No open AR for this period.</p>';
+    return;
+  }
+  data.proj_sections.forEach((sec, i) => {
+    const div = document.createElement('div');
+    div.className = 'proj-section';
+    div.innerHTML = `<h3 class="proj-section-title">${sec.label}</h3>` +
+      buildProjTable(
+        customers,
+        sec.rows,
+        sec.totals,
+        sec.grand_total,
+        i === 0 && data.overdue_total !== 0 ? data.overdue_by_cust : null
+      );
+    projDiv.appendChild(div);
+  });
+  if (data.proj_sections.length === 0 && data.overdue_total !== 0) {
+    const div = document.createElement('div');
+    div.className = 'proj-section';
+    div.innerHTML = `<h3 class="proj-section-title">Balance Outstanding</h3>` +
+      buildProjTable(customers, [], null, 0, data.overdue_by_cust);
+    projDiv.appendChild(div);
+  }
+}
+
+// ---------------- Currency toggle ----------------
+function setCurrency(c) {
+  CURRENCY = c;
+  document.getElementById('btn-idr').classList.toggle('active', c === 'IDR');
+  document.getElementById('btn-usd').classList.toggle('active', c === 'USD');
+  document.getElementById('rate-note').style.display = (c === 'USD') ? 'block' : 'none';
+  renderAll();
+}
+
+function renderAll() {
+  try { renderKPIs(); }        catch (e) { console.error('renderKPIs:', e); }
+  try { renderAgingTable(); }  catch (e) { console.error('renderAgingTable:', e); }
+  try { renderYearTable(); }   catch (e) { console.error('renderYearTable:', e); }
+  try { renderServiceTable(); } catch (e) { console.error('renderServiceTable:', e); }
+  try { renderProjection(); }  catch (e) { console.error('renderProjection:', e); }
+  if (serviceChart) {
+    try { serviceChart.update(); } catch (e) { console.error('chart.update:', e); }
+  }
+}
+
+// Update refresh info text (also shown as fallback "Loading..." if JS dies)
+try {
+  document.getElementById('refresh-info').textContent =
+    'Data as of ' + data.refreshed + '   |   Source: PSI AR Monitoring Master.xlsx';
+} catch (e) { console.error('refresh-info:', e); }
+
+// Wire up currency buttons
+document.getElementById('btn-idr').addEventListener('click', () => setCurrency('IDR'));
+document.getElementById('btn-usd').addEventListener('click', () => setCurrency('USD'));
+
+// Initial render — KPIs, tables, projection ALWAYS render even if Chart.js fails
+renderAll();
+
+// Chart init is wrapped + done LAST so any failure doesn't stop the rest
+try { initChart(); } catch (e) {
+  console.error('initChart failed:', e);
+  const wrap = document.getElementById('serviceChart');
+  if (wrap && wrap.parentElement) {
+    wrap.parentElement.innerHTML =
+      '<div style="padding:24px;background:var(--slate-50);border-radius:12px;text-align:center;color:var(--slate-500);font-size:13px;">' +
+      '<strong style="color:var(--slate-700);">Chart could not be drawn in this preview.</strong><br>' +
+      'Please open in a full browser. The data table below still has all the numbers.</div>';
+  }
+}
+</script>
+</body>
+</html>
