@@ -2,7 +2,12 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F172A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PSI AR">
+<meta name="format-detection" content="telephone=no">
 <title>PT Prasad Seeds Indonesia — Accounts Receivable Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,13 +15,18 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 <style>
-* { box-sizing: border-box; }
+/* =====================================================================
+   PSI AR Dashboard — Liquid Glass UI (iPhone-style)
+   Mobile-first, glassmorphic cards, mesh-gradient wallpaper.
+   ===================================================================== */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 :root {
   --slate-900: #0F172A;
   --slate-800: #1E293B;
   --slate-700: #334155;
   --slate-500: #64748B;
   --slate-400: #94A3B8;
+  --slate-300: #CBD5E1;
   --slate-200: #E2E8F0;
   --slate-100: #F1F5F9;
   --slate-50:  #F8FAFC;
@@ -30,45 +40,81 @@
   --amber-100: #FEF3C7;
   --rose-700: #BE123C;
   --rose-100: #FFE4E6;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 12px 28px rgba(15, 23, 42, 0.12);
+
+  /* Liquid Glass tokens */
+  --glass-bg:        rgba(255, 255, 255, 0.62);
+  --glass-bg-strong: rgba(255, 255, 255, 0.78);
+  --glass-bg-soft:   rgba(255, 255, 255, 0.40);
+  --glass-border:    rgba(255, 255, 255, 0.55);
+  --glass-shadow:
+    0 1px 0 rgba(255,255,255,0.55) inset,
+    0 -1px 0 rgba(15,23,42,0.04) inset,
+    0 10px 30px -10px rgba(15, 23, 42, 0.18),
+    0 2px 6px rgba(15, 23, 42, 0.06);
+  --glass-shadow-hover:
+    0 1px 0 rgba(255,255,255,0.65) inset,
+    0 14px 40px -8px rgba(15, 23, 42, 0.22),
+    0 4px 10px rgba(15, 23, 42, 0.08);
+
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
 }
 html, body {
   margin: 0; padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--slate-50);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+               'Inter', 'Segoe UI', Roboto, sans-serif;
   color: var(--slate-900);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+}
+body {
+  /* iOS-style mesh-gradient wallpaper. Fixed so glass cards float over it. */
+  background:
+    radial-gradient(at 12% 6%,   rgba(99, 102, 241, 0.22) 0%, transparent 45%),
+    radial-gradient(at 88% 12%,  rgba(20, 184, 166, 0.22) 0%, transparent 50%),
+    radial-gradient(at 90% 92%,  rgba(244, 114, 182, 0.16) 0%, transparent 50%),
+    radial-gradient(at 8%  88%,  rgba(34, 211, 238, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, #F4F6FB 0%, #EEF2F8 100%);
+  background-attachment: fixed;
 }
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 28px 24px max(72px, calc(72px + env(safe-area-inset-bottom)));
 }
+
+/* ============ HERO ============ */
 header.hero {
-  background: linear-gradient(135deg, #0F172A 0%, #1E40AF 50%, #0D9488 100%);
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 64, 175, 0.90) 50%, rgba(13, 148, 136, 0.94) 100%);
   color: white;
-  padding: 36px 32px;
-  border-radius: 20px;
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 28px;
+  padding: 30px 30px 28px;
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.18) inset,
+    0 20px 50px -16px rgba(15, 23, 42, 0.45),
+    0 6px 16px rgba(15, 23, 42, 0.12);
+  margin-bottom: 22px;
   position: relative;
   overflow: hidden;
 }
 header.hero::before {
   content: "";
   position: absolute;
-  top: -60px; right: -60px;
-  width: 240px; height: 240px;
-  background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
-  border-radius: 50%;
+  inset: 0;
+  background:
+    radial-gradient(at 80% -10%, rgba(255,255,255,0.30), transparent 50%),
+    radial-gradient(at -10% 110%, rgba(255,255,255,0.18), transparent 55%);
+  pointer-events: none;
 }
+header.hero > * { position: relative; }
 header.hero h1 {
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 header.hero p {
@@ -79,151 +125,170 @@ header.hero p {
 }
 .brand-tag {
   display: inline-block;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   background: rgba(255,255,255,0.18);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.22);
   padding: 5px 12px;
   border-radius: 999px;
   margin-bottom: 14px;
 }
+
+/* ============ CURRENCY TOGGLE (Liquid Glass segmented control) ============ */
 .currency-toggle {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 22px;
+  right: 22px;
   display: flex;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
   border-radius: 999px;
   padding: 4px;
   z-index: 5;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.25);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.25) inset,
+    0 4px 12px rgba(0,0,0,0.14);
 }
 .cur-btn {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.82);
   font-family: inherit;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   padding: 8px 16px;
   border-radius: 999px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 32px;
 }
-.cur-btn:hover:not(.active) {
-  color: #FFFFFF;
-}
+.cur-btn:hover:not(.active) { color: #FFFFFF; }
 .cur-btn.active {
-  background: #FFFFFF;
+  background: rgba(255,255,255,0.96);
   color: var(--slate-900);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 2px 6px rgba(0,0,0,0.18);
 }
 .rate-note {
-  margin: 8px 0 0 0;
+  margin: 10px 0 0 0;
   font-size: 11px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.80);
   font-style: italic;
 }
-@media (max-width: 640px) {
-  .container { padding: 16px 12px 48px; }
-  header.hero {
-    padding: 24px 20px;
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  header.hero h1 { font-size: 22px; }
-  .currency-toggle {
-    position: static;
-    margin: 0 0 14px 0;
-    order: -1;
-  }
-  .cur-btn { padding: 6px 12px; font-size: 11px; }
-  .kpi { padding: 18px 16px 20px; }
-  .kpi-value { font-size: 22px; }
-  .card { padding: 20px 16px 18px; border-radius: 14px; }
-  .group-title { font-size: 12px; margin: 14px 4px 8px; }
-  table.matrix { font-size: 12px; }
-  table.matrix th, table.matrix td { padding: 8px 8px; }
-}
+
+/* ============ TABS (sticky glass segmented control) ============ */
 .tabs {
   display: flex;
-  gap: 6px;
-  margin: 0 0 20px 0;
-  border-bottom: 2px solid var(--slate-200);
+  gap: 4px;
+  margin: 0 0 18px 0;
+  padding: 5px;
   position: sticky;
-  top: 0;
-  background: var(--slate-50);
-  z-index: 10;
-  padding: 8px 4px 0 4px;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  top: 8px;
+  z-index: 20;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
 }
 .tab-btn {
   background: transparent;
   border: none;
-  border-bottom: 3px solid transparent;
-  padding: 12px 20px;
+  flex: 1;
+  padding: 10px 18px;
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
   color: var(--slate-500);
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
-  margin-bottom: -2px;
-  letter-spacing: 0.01em;
+  border-radius: 11px;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: -0.005em;
+  min-height: 40px;
 }
-.tab-btn:hover:not(.active) { color: var(--slate-700); }
+.tab-btn:hover:not(.active) { color: var(--slate-700); background: rgba(255,255,255,0.45); }
 .tab-btn.active {
   color: var(--slate-900);
-  border-bottom-color: var(--teal-600);
+  background: rgba(255,255,255,0.96);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.9) inset,
+    0 1px 3px rgba(15, 23, 42, 0.10),
+    0 4px 10px rgba(15, 23, 42, 0.06);
 }
 .tab-panel.tab-hidden { display: none; }
-@media (max-width: 640px) {
-  .tabs { padding: 6px 2px 0 2px; gap: 2px; }
-  .tab-btn { padding: 10px 14px; font-size: 13px; }
-}
 
+/* ============ SECTION HEADERS ============ */
 .group-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--slate-500);
-  margin: 18px 4px 10px 4px;
-  padding-left: 4px;
-  border-left: 4px solid var(--teal-600);
+  letter-spacing: 0.10em;
+  color: var(--slate-700);
+  margin: 22px 4px 12px 4px;
+  padding-left: 10px;
+  border-left: 3px solid var(--teal-600);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
-.group-title:first-of-type { margin-top: 8px; }
-.group-title span { color: var(--slate-700); text-transform: none; letter-spacing: 0; }
+.group-title:first-of-type { margin-top: 6px; }
+.group-title span {
+  color: var(--slate-500);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 6px;
+}
+
+/* ============ KPI GRID + GLASS KPI CARDS ============ */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 18px;
+  gap: 14px;
   margin-bottom: 18px;
 }
 .kpi {
-  background: white;
-  border-radius: 16px;
-  padding: 22px 20px 24px;
-  box-shadow: var(--shadow-md);
-  border-top: 4px solid;
-  transition: transform .18s ease, box-shadow .18s ease;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 20px 20px 22px;
+  box-shadow: var(--glass-shadow);
+  border-top-width: 3px;
+  border-top-style: solid;
+  transition: transform .22s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow .22s ease;
   position: relative;
   overflow: hidden;
 }
+/* Glass top-sheen highlight */
+.kpi::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.32), transparent);
+  pointer-events: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.kpi > * { position: relative; }
 .kpi:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-hover);
 }
 .kpi-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--slate-500);
@@ -231,8 +296,8 @@ header.hero p {
 }
 .kpi-value {
   font-size: 26px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin-bottom: 4px;
 }
 .kpi-sub {
@@ -240,16 +305,17 @@ header.hero p {
   color: var(--slate-500);
   font-weight: 500;
 }
+
 .kpi.total    { border-top-color: var(--slate-900); }
 .kpi.tooling  { border-top-color: var(--indigo-700); }
-.kpi.rental   { border-top-color: #0891B2; }   /* cyan-600 */
+.kpi.rental   { border-top-color: #0891B2; }
 .kpi.berjalan { border-top-color: var(--teal-600); }
 .kpi.lama     { border-top-color: var(--rose-700); }
 .kpi.billing  { border-top-color: var(--emerald-600); }
 .kpi.coll     { border-top-color: var(--amber-500); }
 .kpi.coll-ytd { border-top-color: #F59E0B; }
-.kpi.coll-y1  { border-top-color: #9333EA; }   /* purple-600 */
-.kpi.coll-y2  { border-top-color: #7E22CE; }   /* purple-700 */
+.kpi.coll-y1  { border-top-color: #9333EA; }
+.kpi.coll-y2  { border-top-color: #7E22CE; }
 .kpi.total    .kpi-value { color: var(--slate-900); }
 .kpi.tooling  .kpi-value { color: var(--indigo-700); }
 .kpi.rental   .kpi-value { color: #0891B2; }
@@ -261,18 +327,34 @@ header.hero p {
 .kpi.coll-y1  .kpi-value { color: #9333EA; }
 .kpi.coll-y2  .kpi-value { color: #7E22CE; }
 
+/* ============ CONTENT GLASS CARDS ============ */
 .card {
-  background: white;
-  border-radius: 16px;
-  padding: 28px 28px 24px;
-  box-shadow: var(--shadow-md);
-  margin-bottom: 24px;
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 26px 26px 24px;
+  box-shadow: var(--glass-shadow);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
 }
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 60px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.40), transparent);
+  pointer-events: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.card > * { position: relative; }
 .card h2 {
   font-size: 18px;
   font-weight: 700;
   margin: 0 0 6px 0;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  color: var(--slate-900);
 }
 .card .desc {
   font-size: 13px;
@@ -280,6 +362,7 @@ header.hero p {
   margin: 0 0 18px 0;
 }
 
+/* ============ TABLES ============ */
 table.matrix {
   width: 100%;
   border-collapse: separate;
@@ -289,7 +372,7 @@ table.matrix {
 table.matrix th, table.matrix td {
   padding: 10px 12px;
   text-align: right;
-  border-bottom: 1px solid var(--slate-100);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
 }
 table.matrix th:first-child, table.matrix td:first-child {
   text-align: left;
@@ -297,40 +380,32 @@ table.matrix th:first-child, table.matrix td:first-child {
   color: var(--slate-700);
 }
 table.matrix thead th {
-  background: var(--slate-100);
+  background: rgba(241, 245, 249, 0.55);
   color: var(--slate-700);
   font-weight: 600;
-  font-size: 12px;
+  font-size: 11.5px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  border-bottom: 2px solid var(--slate-200);
+  border-bottom: 2px solid rgba(203, 213, 225, 0.6);
 }
-table.matrix tr:last-child td {
-  border-bottom: none;
-}
+table.matrix tr:last-child td { border-bottom: none; }
 table.matrix tr.total {
-  background: var(--amber-100);
+  background: rgba(254, 243, 199, 0.55);
   font-weight: 700;
 }
-table.matrix tr.total td {
-  border-top: 2px solid var(--amber-500);
-}
-table.matrix td.bucket-cell {
-  font-weight: 600;
-  border-radius: 4px;
-}
+table.matrix tr.total td { border-top: 2px solid var(--amber-500); }
+table.matrix td.bucket-cell { font-weight: 600; border-radius: 4px; }
 
-tr.year-old td      { background: var(--rose-100) !important; }
-tr.year-current td  { background: var(--emerald-100) !important; }
-tr.year-paid td     { background: var(--slate-100) !important; color: var(--slate-500) !important; font-style: italic; }
+tr.year-old td     { background: rgba(255, 228, 230, 0.6) !important; }
+tr.year-current td { background: rgba(209, 250, 229, 0.55) !important; }
+tr.year-paid td    { background: rgba(241, 245, 249, 0.65) !important; color: var(--slate-500) !important; font-style: italic; }
 tr.year-old td:first-child,
 tr.year-current td:first-child { font-weight: 700; }
 
 td.gap-high    { background: #FEF3C7; font-weight: 700; color: #92400E; }
 td.gap-catchup { background: #D1FAE5; font-weight: 700; color: #065F46; }
 
-/* Daily Projection uses tabular numbers + slightly smaller font so full
-   amounts (Rp 53,376,751,536) stay readable without huge column widths. */
+/* Daily Projection: full amounts in tabular numbers */
 table.proj-matrix { font-size: 12px; }
 table.proj-matrix td, table.proj-matrix th {
   padding: 8px 10px;
@@ -338,28 +413,33 @@ table.proj-matrix td, table.proj-matrix th {
   white-space: nowrap;
 }
 
-/* Invoice Issued vs Service Given section */
+/* ============ IvS toggles (glass pill buttons) ============ */
 .ivs-toggles {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
-  margin: 10px 0 18px 0;
+  gap: 18px;
+  margin: 8px 0 18px 0;
   padding: 12px 14px;
-  background: var(--slate-50);
-  border-radius: 10px;
+  background: rgba(241, 245, 249, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius-md);
 }
-.ivs-toggle-group { display: flex; align-items: center; gap: 8px; }
+.ivs-toggle-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .ivs-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--slate-500);
   margin-right: 2px;
 }
 .ivs-btn {
-  background: white;
-  border: 1px solid var(--slate-200);
+  background: rgba(255,255,255,0.85);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
   color: var(--slate-700);
   font-family: inherit;
   font-size: 13px;
@@ -367,26 +447,27 @@ table.proj-matrix td, table.proj-matrix th {
   padding: 7px 14px;
   border-radius: 999px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 32px;
 }
-.ivs-btn:hover:not(.active) {
-  background: var(--slate-100);
-}
+.ivs-btn:hover:not(.active) { background: white; transform: translateY(-1px); }
 .ivs-btn.active {
   background: var(--slate-900);
   color: white;
   border-color: var(--slate-900);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.20);
 }
-table.ivs-matrix { font-size: 12px; }
+
+table.ivs-matrix { font-size: 11px; }
 table.ivs-matrix th, table.ivs-matrix td {
-  padding: 7px 9px;
+  padding: 6px 8px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 table.ivs-matrix thead th.month-group {
   text-align: center;
   border-bottom: 2px solid var(--slate-300);
-  background: var(--slate-100);
+  background: rgba(241, 245, 249, 0.65);
   color: var(--slate-700);
 }
 table.ivs-matrix thead th.iss { color: var(--indigo-700); }
@@ -395,13 +476,12 @@ table.ivs-matrix td.iss { color: var(--indigo-800); }
 table.ivs-matrix td.svc { color: var(--teal-600); }
 table.ivs-matrix td.gap-cell { background: #FEF3C7; font-weight: 700; }
 
-/* Sticky first column so Customer name stays visible when scrolling right.
-   Uses explicit .cust-sticky class - applying to :first-child accidentally
-   also makes the 2nd header row's first TH (Inv) sticky and overlap. */
+/* Sticky Customer column when scrolling horizontally */
 .ivs-scroll {
   overflow-x: auto;
   overflow-y: visible;
   position: relative;
+  -webkit-overflow-scrolling: touch;
 }
 table.ivs-matrix th.cust-sticky,
 table.ivs-matrix tbody td:first-child {
@@ -409,19 +489,16 @@ table.ivs-matrix tbody td:first-child {
   left: 0;
   z-index: 2;
   background: white;
-  border-right: 2px solid var(--slate-200);
+  border-right: 2px solid rgba(226, 232, 240, 0.9);
 }
 table.ivs-matrix th.cust-sticky {
-  background: var(--slate-100);
+  background: rgba(241, 245, 249, 0.96);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   z-index: 3;
 }
 table.ivs-matrix tbody tr.total td:first-child {
-  background: var(--amber-100);
-}
-/* Smaller font so full amounts fit comfortably */
-table.ivs-matrix { font-size: 11px; }
-table.ivs-matrix th, table.ivs-matrix td {
-  padding: 6px 8px;
+  background: rgba(254, 243, 199, 0.95);
 }
 
 .section-grid {
@@ -443,7 +520,7 @@ table.ivs-matrix th, table.ivs-matrix td {
   margin: 0 0 8px 0;
 }
 .overdue-row {
-  background: var(--rose-100) !important;
+  background: rgba(255, 228, 230, 0.6) !important;
   color: var(--rose-700) !important;
   font-weight: 700;
 }
@@ -452,19 +529,155 @@ table.ivs-matrix th, table.ivs-matrix td {
 footer {
   text-align: center;
   font-size: 11px;
-  color: var(--slate-400);
+  color: var(--slate-500);
   margin-top: 32px;
   letter-spacing: 0.04em;
 }
 .share-tip {
   margin-top: 18px;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.14);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   color: white;
   font-size: 12px;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.22);
 }
 .empty-cell { color: var(--slate-400); }
+
+/* Native momentum scrolling on iOS for any horizontal-scroll container */
+[style*="overflow-x"] { -webkit-overflow-scrolling: touch; }
+
+/* =====================================================================
+   MOBILE (≤ 760px) — phone-friendly layout, 2-col KPI grid
+   ===================================================================== */
+@media (max-width: 760px) {
+  .container { padding: 14px 12px max(56px, calc(56px + env(safe-area-inset-bottom))); }
+
+  header.hero {
+    padding: 22px 18px 22px;
+    border-radius: 18px;
+    margin-bottom: 14px;
+  }
+  header.hero h1 {
+    font-size: 20px;
+    line-height: 1.25;
+  }
+  header.hero p { font-size: 12.5px; }
+  .brand-tag {
+    font-size: 9.5px;
+    padding: 4px 10px;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+
+  /* Currency toggle becomes full-width segmented control at top of hero */
+  .currency-toggle {
+    position: static;
+    margin: 0 0 14px 0;
+    order: -1;
+    width: 100%;
+    justify-content: stretch;
+  }
+  .currency-toggle .cur-btn {
+    flex: 1;
+    padding: 8px 6px;
+    font-size: 11.5px;
+    min-height: 36px;
+  }
+
+  /* Sticky glass tab bar (with safe-area handling) */
+  .tabs {
+    top: max(6px, env(safe-area-inset-top));
+    padding: 4px;
+    margin: 0 0 14px 0;
+    border-radius: 14px;
+    gap: 3px;
+  }
+  .tab-btn {
+    padding: 9px 8px;
+    font-size: 13px;
+    min-height: 40px;
+    border-radius: 11px;
+    letter-spacing: -0.005em;
+  }
+
+  .group-title {
+    font-size: 11.5px;
+    margin: 16px 2px 8px;
+    padding-left: 8px;
+    letter-spacing: 0.08em;
+    border-left-width: 3px;
+  }
+  .group-title span { font-size: 11.5px; }
+
+  /* KPI: 2-col grid on phones (was 1-col, too much scrolling) */
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .kpi {
+    padding: 14px 14px 16px;
+    border-radius: 14px;
+    border-top-width: 3px;
+  }
+  .kpi-label  { font-size: 9.5px; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .kpi-value  { font-size: 18px; letter-spacing: -0.02em; }
+  .kpi-sub    { font-size: 10.5px; line-height: 1.35; }
+
+  .card {
+    padding: 18px 14px 16px;
+    border-radius: 18px;
+    margin-bottom: 14px;
+  }
+  .card h2 { font-size: 16px; line-height: 1.3; }
+  .card .desc { font-size: 12px; line-height: 1.5; margin-bottom: 14px; }
+
+  /* Tighter table padding/fonts so data fits on a phone screen */
+  table.matrix { font-size: 11.5px; }
+  table.matrix th, table.matrix td { padding: 7px 8px; }
+  table.matrix thead th { font-size: 10px; }
+  table.proj-matrix { font-size: 10.5px; }
+  table.proj-matrix th, table.proj-matrix td { padding: 6px 7px; }
+  table.ivs-matrix { font-size: 10px; }
+  table.ivs-matrix th, table.ivs-matrix td { padding: 5px 6px; }
+
+  .ivs-toggles { gap: 10px; padding: 10px 10px; border-radius: 12px; }
+  .ivs-toggle-group { width: 100%; }
+  .ivs-btn { font-size: 12px; padding: 7px 12px; min-height: 34px; }
+  .ivs-label { width: 100%; margin-bottom: 2px; }
+}
+
+/* Smallest phones (iPhone SE, etc.) — give KPI values more headroom */
+@media (max-width: 380px) {
+  .kpi-value { font-size: 16px; }
+  .tab-btn { font-size: 12px; padding: 9px 6px; }
+  header.hero h1 { font-size: 18px; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Print: flatten glass effects for paper output */
+@media print {
+  body { background: white !important; }
+  .kpi, .card, .tabs {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: white !important;
+    box-shadow: none !important;
+    border: 1px solid #E2E8F0 !important;
+  }
+  .currency-toggle, .ivs-toggles { display: none !important; }
+  .tab-panel.tab-hidden { display: block !important; }
+}
 </style>
 </head>
 <body>
@@ -563,7 +776,7 @@ footer {
 </div>
 
 <script>
-const data = {"refreshed": "Thursday, 21 May 2026 - 16:42", "refresh_short": "21 May 2026", "current_year": 2026, "kpi": {"total_ar": 50807180164.58422, "tahun_berjalan": 20175546452.029274, "saldo_lama": 30631633712.554955, "tooling": 38613899962.24014, "rental": 12193280202.344078, "billing": 7235612271.351756, "billing_month": "May 2026", "collection": 10412393498.306433, "collection_month": "May 2026", "collection_ytd": 131113230523.26775, "collection_y1": 288569069004.3917, "collection_y2": 743923283.0599998}, "aging_order": ["NOT YET DUE", "0-30", "31-60", "61-90", "91-180", "181-365", ">1 year"], "aging_descriptions": {"NOT YET DUE": "Belum jatuh tempo", "0-30": "Overdue 1-30 hari", "31-60": "Overdue 31-60 hari", "61-90": "Overdue 61-90 hari", "91-180": "Overdue 91-180 hari", "181-365": "Overdue 181-365 hari", ">1 year": "Overdue > 1 tahun"}, "aging_colors": {"NOT YET DUE": "#00B050", "0-30": "#92D050", "31-60": "#FFD966", "61-90": "#F4B084", "91-180": "#ED7D31", "181-365": "#C00000", ">1 year": "#5B0E0E"}, "aging_text_colors": {"NOT YET DUE": "#FFFFFF", "0-30": "#0F172A", "31-60": "#0F172A", "61-90": "#0F172A", "91-180": "#FFFFFF", "181-365": "#FFFFFF", ">1 year": "#FFFFFF"}, "customers": ["PT Sygenta Seed Indonesia", "PT Advanta Seeds Indonesia", "PT Alam Semesta Agro", "PT Corteva Agriscience Seed Indonesia", "PT Bayer Indonesia", "Nuziveedu", "Bioseed"], "aging_rows": [{"customer": "PT Sygenta Seed Indonesia", "buckets": [9709325506.178198, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 9709325506.178198}, {"customer": "PT Advanta Seeds Indonesia", "buckets": [3065595382.9700913, 3228075712.3296957, -298186743.3988662, 281616408.88856226, 6347132.378918919, 0.0, 0.0], "total": 6283447893.168402}, {"customer": "PT Alam Semesta Agro", "buckets": [412080000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 412080000.0}, {"customer": "PT Corteva Agriscience Seed Indonesia", "buckets": [2548251282.4285135, 684766225.8141532, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 3233017508.2426667}, {"customer": "PT Bayer Indonesia", "buckets": [419170619.09000003, 118504925.35, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 537675544.44}, {"customer": "Nuziveedu", "buckets": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1031722365.0], "total": 1031722365.0}, {"customer": "Bioseed", "buckets": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 29599911347.554955], "total": 29599911347.554955}], "grand_total_buckets": [16154422790.666803, 4031346863.493849, -298186743.3988662, 281616408.88856226, 6347132.378918919, 0.0, 30631633712.554955], "overdue_by_cust": {"PT Sygenta Seed Indonesia": 0.0, "PT Advanta Seeds Indonesia": 3217852510.1983104, "PT Alam Semesta Agro": 0.0, "PT Corteva Agriscience Seed Indonesia": 684766225.8141532, "PT Bayer Indonesia": 118504925.35000001, "Nuziveedu": 1031722365.0, "Bioseed": 29599911347.554955}, "overdue_total": 34652757373.91742, "overdue_label": "May 2026", "proj_sections": [{"label": "May 2026", "rows": [{"date": "24 May 2026", "values": [0.0, 1101104301.3513513, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 1101104301.3513513}, {"date": "26 May 2026", "values": [825500320.1351349, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 825500320.1351349}, {"date": "28 May 2026", "values": [0.0, 0.0, 0.0, 406112131.2536937, 0.0, 0.0, 0.0], "total": 406112131.2536937}, {"date": "30 May 2026", "values": [0.0, 223970887.84874, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 223970887.84874}], "totals": [825500320.1351349, 1325075189.2000914, 0.0, 406112131.2536937, 0.0, 0.0, 0.0], "grand_total": 2556687640.58892}, {"label": "June 2026", "rows": [{"date": "02 Jun 2026", "values": [936954398.671171, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 936954398.671171}, {"date": "04 Jun 2026", "values": [0.0, 0.0, 0.0, 1068248720.0, 0.0, 0.0, 0.0], "total": 1068248720.0}, {"date": "07 Jun 2026", "values": [0.0, 0.0, 412080000.0, 0.0, 0.0, 0.0, 0.0], "total": 412080000.0}, {"date": "09 Jun 2026", "values": [2764691563.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 2764691563.8}, {"date": "11 Jun 2026", "values": [0.0, 0.0, 0.0, 555591360.56, 0.0, 0.0, 0.0], "total": 555591360.56}, {"date": "13 Jun 2026", "values": [223540169.5135135, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 223540169.5135135}, {"date": "15 Jun 2026", "values": [851303739.8918917, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 851303739.8918917}, {"date": "16 Jun 2026", "values": [75268108.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 75268108.8}, {"date": "18 Jun 2026", "values": [0.0, 0.0, 0.0, 285579262.3056757, 0.0, 0.0, 0.0], "total": 285579262.3056757}, {"date": "21 Jun 2026", "values": [152520206.1081081, 1740520193.77, 0.0, 0.0, 419170619.09000003, 0.0, 0.0], "total": 2312211018.968108}, {"date": "25 Jun 2026", "values": [0.0, 0.0, 0.0, 232719808.3091441, 0.0, 0.0, 0.0], "total": 232719808.3091441}, {"date": "30 Jun 2026", "values": [289305486.94144136, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 289305486.94144136}], "totals": [5293583673.726126, 1740520193.77, 412080000.0, 2142139151.1748197, 419170619.09000003, 0.0, 0.0], "grand_total": 10007493637.760946}, {"label": "July 2026", "rows": [{"date": "06 Jul 2026", "values": [2883201204.58, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 2883201204.58}, {"date": "17 Jul 2026", "values": [707040307.7369367, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 707040307.7369367}], "totals": [3590241512.3169365, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "grand_total": 3590241512.3169365}], "service_billing": [{"month": "Jun 2025", "performed": 13615668974.42964, "invoiced": 8393126068.2473545, "gap": 5222542906.182285, "pct_invoiced": 0.6164314132496705, "note": "Many services uninvoiced"}, {"month": "Jul 2025", "performed": 13978232594.40502, "invoiced": 13430086367.517927, "gap": 548146226.8870926, "pct_invoiced": 0.9607857271521941, "note": "On track"}, {"month": "Aug 2025", "performed": 48586290116.633575, "invoiced": 34733261287.44349, "gap": 13853028829.190086, "pct_invoiced": 0.7148778226134314, "note": "Partially uninvoiced"}, {"month": "Sep 2025", "performed": 68255640051.32751, "invoiced": 67971714009.00736, "gap": 283926042.32014465, "pct_invoiced": 0.9958402552213028, "note": "On track"}, {"month": "Oct 2025", "performed": 66793712354.01656, "invoiced": 63827327546.06796, "gap": 2966384807.948601, "pct_invoiced": 0.9555888615349553, "note": "On track"}, {"month": "Nov 2025", "performed": 84371132941.67935, "invoiced": 31245109766.04071, "gap": 53126023175.63864, "pct_invoiced": 0.3703293849051258, "note": "Many services uninvoiced"}, {"month": "Dec 2025", "performed": 15421312930.929237, "invoiced": 86240159201.3014, "gap": -70818846270.37216, "pct_invoiced": 5.592270877814608, "note": "Catch-up: prior-month invoices issued"}, {"month": "Jan 2026", "performed": 9270127141.507723, "invoiced": 13827779290.76451, "gap": -4557652149.256786, "pct_invoiced": 1.4916493678764706, "note": "Catch-up: prior-month invoices issued"}, {"month": "Feb 2026", "performed": 13136105644.05059, "invoiced": 10232991763.920591, "gap": 2903113880.129999, "pct_invoiced": 0.7789973711543015, "note": "Partially uninvoiced"}, {"month": "Mar 2026", "performed": 14436328847.81583, "invoiced": 14795617887.569881, "gap": -359289039.7540512, "pct_invoiced": 1.0248878398061991, "note": "On track"}, {"month": "Apr 2026", "performed": 8775653898.015, "invoiced": 14358678838.518154, "gap": -5583024940.503155, "pct_invoiced": 1.6361947503155294, "note": "Catch-up: prior-month invoices issued"}, {"month": "May 2026", "performed": 634404117.4774773, "invoiced": 7235612271.351756, "gap": -6601208153.874279, "pct_invoiced": 11.40536776482797, "note": "Catch-up: prior-month invoices issued"}], "year_rows": [{"label": "Year 2020 (Jan-Dec)", "year": 2020, "tooling": 13098981258.0, "rental": 0.0, "total": 13098981258.0, "tag": "old"}, {"label": "Year 2021 (Jan-Dec)", "year": 2021, "tooling": 8122709353.000001, "rental": 0.0, "total": 8122709353.000001, "tag": "old"}, {"label": "Year 2022 (Jan-Dec)", "year": 2022, "tooling": 3086407758.0, "rental": 0.0, "total": 3086407758.0, "tag": "old"}, {"label": "Year 2023 (Jan-Dec)", "year": 2023, "tooling": 3003330758.6, "rental": 0.0, "total": 3003330758.6, "tag": "old"}, {"label": "Year 2024 (Jan-Dec)", "year": 2024, "tooling": 3320204584.9549556, "rental": 0.0, "total": 3320204584.9549556, "tag": "old"}, {"label": "Year 2025 (Jan-Dec) — Fully Paid", "year": 2025, "tooling": 0.0, "rental": 0.0, "total": 0.0, "tag": "paid"}, {"label": "Year 2026 (Jan-Dec)", "year": 2026, "tooling": 7982266249.685187, "rental": 12193280202.344078, "total": 20175546452.029266, "tag": "current"}], "year_grand_total": {"tooling": 38613899962.24014, "rental": 12193280202.344078, "total": 50807180164.58422}, "inv_vs_svc": {"month_keys_all": ["2020-05", "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12", "2021-08", "2021-11", "2021-12", "2022-02", "2022-06", "2022-10", "2022-11", "2023-03", "2023-10", "2024-06", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05"], "month_labels_all": ["May 2020", "Jul 2020", "Aug 2020", "Sep 2020", "Oct 2020", "Nov 2020", "Dec 2020", "Aug 2021", "Nov 2021", "Dec 2021", "Feb 2022", "Jun 2022", "Oct 2022", "Nov 2022", "Mar 2023", "Oct 2023", "Jun 2024", "Sep 2024", "Oct 2024", "Nov 2024", "Dec 2024", "Jan 2025", "Feb 2025", "Mar 2025", "Apr 2025", "May 2025", "Jun 2025", "Jul 2025", "Aug 2025", "Sep 2025", "Oct 2025", "Nov 2025", "Dec 2025", "Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026"], "years_available": ["2020", "2021", "2022", "2023", "2024", "2025", "2026"], "invoiced_amount": {"Tooling": {"PT Sygenta Seed Indonesia": {"2024-11": 14955941035.567568, "2024-12": 13517274028.333332, "2025-01": 2063561702.5225224, "2025-02": 830154723.2432432, "2025-03": 4428601379.099099, "2025-06": 491504543.018018, "2025-08": 15189721649.027027, "2025-09": 36927708141.54955, "2025-10": 18348799730.585587, "2025-11": 411896270.2702703, "2026-01": 46377260.8, "2026-02": 4132755614.4054046, "2026-03": 3778925709.9675674, "2026-04": 2528892109.926126, "2026-05": 707040307.7369367}, "PT Advanta Seeds Indonesia": {"2024-11": 13823094853.054052, "2024-12": 2547032943.5765767, "2025-01": 3184056356.5855856, "2025-02": 2319056162.774774, "2025-03": 3906950717.07928, "2025-04": 3366102029.018018, "2025-05": 1147118488.3423424, "2025-06": 186091013.00000003, "2025-07": 4971116300.864865, "2025-08": 5264460186.252252, "2025-09": 10392322771.504505, "2025-10": 20300886772.720722, "2025-11": 11727429.801801803, "2025-12": 60570832135.36037, "2026-01": 7766643367.252254, "2026-02": 330957527.81081086, "2026-03": 1719092359.7657657, "2026-04": 2530489748.4414415}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 8782546852.697159, "2025-02": 3265229375.031688, "2025-03": 2805258028.085951, "2025-04": 4497605185.897712, "2025-05": 2386949003.763153, "2025-06": 1043041204.7393377, "2025-07": 3078854480.2530627, "2025-08": 5834361391.586091, "2025-09": 10835931261.673307, "2025-10": 15718280049.071657, "2025-11": 23416399340.388638, "2025-12": 12320507875.419407, "2026-02": 476716225.7332972, "2026-03": 1015488535.4065764, "2026-04": 1799432161.288153, "2026-05": 518299070.6148198}, "PT Bayer Indonesia": {"2024-12": 842597880.02, "2025-01": 60590599.400000006, "2025-02": 126107350.53, "2025-03": 758248878.57, "2025-04": 96269642.57, "2025-05": 8286902535.930001, "2025-06": 337879366.3, "2025-07": 1606091416.7599998, "2025-08": 1758026367.43, "2025-09": 4809764294.370001, "2025-10": 5685549828.4, "2025-11": 485150200.43, "2025-12": 4710173587.4800005, "2026-01": 1260049308.6, "2026-04": 118504925.35, "2026-05": 419170619.09000003}, "Nuziveedu": {"2023-03": 1631132680.0}, "Bioseed": {"2020-05": 708320700.0, "2020-07": 2493578088.0, "2020-08": 3966095340.0, "2020-09": 1848564072.0, "2020-10": 702480600.0, "2020-11": 1296085050.0, "2020-12": 2083857408.0, "2021-08": 1744027115.6000001, "2021-11": 3559828955.6000004, "2021-12": 2818853281.8, "2022-02": 1886139216.0, "2022-06": 432911942.8, "2022-10": 564233093.6, "2022-11": 203123505.6, "2023-03": 918278609.5999999, "2023-10": 1053329784.0, "2024-12": 3320204584.9549556}}, "Rental": {"PT Sygenta Seed Indonesia": {"2024-10": 648689468.0, "2024-11": 1564105768.73, "2024-12": 2816784099.48, "2025-01": 576926269.28, "2025-02": 2629307196.52, "2025-03": 2585242294.36, "2025-04": 2759451744.4, "2025-05": 2639803023.6000004, "2025-06": 2563239852.3999996, "2025-07": 2571778150.0, "2025-08": 2591826993.4, "2025-09": 2691199773.31, "2025-10": 1444136824.4, "2025-11": 4505474776.15, "2025-12": 2826789797.8, "2026-01": 2753367161.0, "2026-02": 1276640000.0, "2026-03": 4207804733.0, "2026-04": 2764691563.8, "2026-05": 2883201204.58}, "PT Advanta Seeds Indonesia": {"2024-10": 10000000.0, "2024-11": 51870305.0, "2024-12": 440970090.0, "2025-01": 21443500.0, "2025-02": 222617045.0, "2025-03": 219497045.0, "2025-04": 238989264.0, "2025-05": 216288627.0, "2025-06": 2945157737.0199995, "2025-07": 1111721150.23, "2025-08": 1052758204.631, "2025-09": 1015229178.91, "2025-10": 1055385620.89, "2025-11": 1140173029.0, "2025-12": 2080674647.7844, "2026-01": 1795302193.112256, "2026-02": 1849200632.5232959, "2026-03": 2078537034.286092, "2026-04": 2074058758.4587402, "2026-05": 1740229708.77}, "PT Alam Semesta Agro": {"2025-04": 59205901.120000005, "2025-05": 119978263.85, "2025-06": 82289068.71000001, "2025-07": 90524869.41, "2025-08": 139541600.0, "2025-09": 208800534.0, "2025-10": 206040000.0, "2025-11": 206040000.0, "2025-12": 206040000.0, "2026-01": 206040000.0, "2026-02": 189720000.0, "2026-03": 206040000.0, "2026-05": 412080000.0}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 763542295.7099999, "2025-01": 239765295.80180177, "2025-02": 721414719.9999999, "2025-03": 743923283.0599998, "2025-04": 721414719.9999999, "2025-05": 721414719.9999999, "2025-06": 743923283.0599998, "2025-08": 2902564895.117117, "2025-09": 1090758053.6899998, "2025-10": 1068248719.9999999, "2025-11": 1068248719.9999999, "2025-12": 3525141157.4572363, "2026-02": 1977001763.4477835, "2026-03": 1789729515.1438804, "2026-04": 2542609571.2536936, "2026-05": 555591360.56}}}, "invoiced_qty": {"Tooling": {"PT Sygenta Seed Indonesia": {"2024-11": 4475212.0, "2024-12": 4015838.0, "2025-01": 647100.0, "2025-02": 259560.0, "2025-03": 1371360.0, "2025-06": 1.0, "2025-08": 4289035.0, "2025-09": 9118865.0, "2025-10": 4436536.0, "2025-11": 126000.0, "2026-01": 1147952.0, "2026-02": 1885411.0, "2026-03": 1118327.0, "2026-04": 1332165.5, "2026-05": 383873.0}, "PT Advanta Seeds Indonesia": {"2024-11": 4055036.0, "2024-12": 1297014.0, "2025-01": 1315762.0, "2025-02": 899443.0, "2025-03": 1621664.0, "2025-04": 1234563.0, "2025-05": 631496.0, "2025-06": 177147.0, "2025-07": 2337950.0, "2025-08": 1720765.0, "2025-09": 3701324.0, "2025-10": 6638413.0, "2025-11": 2456.0, "2025-12": 17674831.5, "2026-01": 2706025.0, "2026-02": 228135.5, "2026-03": 1564252.0, "2026-04": 2125651.0}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 1632467.65, "2025-02": 770672.88, "2025-03": 1054385.8, "2025-04": 1297606.45, "2025-05": 829456.0, "2025-06": 583421.9, "2025-07": 691997.0, "2025-08": 1509398.2, "2025-09": 2589935.882, "2025-10": 3551088.6999999997, "2025-11": 4291375.699999999, "2025-12": 2452563.35, "2026-02": 523253.63999999996, "2026-03": 607101.75, "2026-04": 4496695.95, "2026-05": 1265851.75}, "PT Bayer Indonesia": {"2024-12": 116662.0, "2025-01": 16567.0, "2025-02": 26514.0, "2025-03": 409347.0, "2025-04": 46858.0, "2025-05": 1402426.0, "2025-06": 53972.0, "2025-07": 305084.0, "2025-08": 524715.0, "2025-09": 902364.0, "2025-10": 852895.0, "2025-11": 224665.0, "2025-12": 696637.0, "2026-01": 176306.0, "2026-04": 228905.0, "2026-05": 196433.0}, "Nuziveedu": {"2023-03": 31580.0}, "Bioseed": {"2022-02": 325256.0, "2022-06": 211259.0, "2022-10": 157369.0, "2022-11": 94851.0, "2023-03": 144892.0, "2023-10": 514020.0, "2024-12": 1151500.0}}, "Rental": {"PT Sygenta Seed Indonesia": {"2025-01": 2001472.0, "2025-02": 13402778.0, "2025-03": 13681671.0, "2025-04": 14793689.0, "2025-05": 13201821.0, "2025-06": 11933202.0, "2025-07": 12144068.0, "2025-08": 12369133.5, "2025-09": 13043608.0, "2025-10": 6799733.0, "2025-11": 25180237.0, "2025-12": 13809207.0, "2026-01": 12514937.0, "2026-02": 4000000.0, "2026-03": 20956311.0, "2026-04": 13497998.0, "2026-05": 14303319.0}, "PT Advanta Seeds Indonesia": {"2025-06": 3925010.0, "2025-07": 192936.0, "2025-08": 120375.9, "2025-09": 147453.0, "2025-10": 362932.0, "2025-11": 2579000.0, "2025-12": 191397.0, "2026-01": 126266.83999999997, "2026-02": 171659.44000000006, "2026-03": 5462971.38, "2026-04": 5406868.1, "2026-05": 5224093.0}, "PT Alam Semesta Agro": {"2025-04": 362352.0, "2025-05": 650494.0, "2025-06": 431564.0, "2025-07": 297383.0, "2025-08": 314.0, "2025-09": 121110.0, "2025-10": 510.0, "2025-11": 510.0, "2025-12": 510.0, "2026-01": 510.0, "2026-02": 510.0, "2026-03": 510000.0, "2026-05": 1020.0}, "PT Corteva Agriscience Seed Indonesia": {"2025-12": 125990966.55200008, "2026-02": 2784332.0141935484, "2026-03": 9159128.336774195, "2026-04": 15253280.0, "2026-05": 1700837.0}}}, "service_amount": {"Tooling": {"PT Sygenta Seed Indonesia": {"2024-10": 3076005807.468468, "2024-11": 17370488227.36937, "2024-12": 8518225572.08108, "2025-01": 2063561702.5225224, "2025-02": 2014027290.8108108, "2025-03": 3244728811.5315313, "2025-07": 1026177432.2882881, "2025-08": 25421071443.144146, "2025-09": 32154766823.468468, "2025-10": 12276110092.531532, "2025-12": 46377260.8, "2026-01": 314093308.6756757, "2026-02": 3829213614.1297293, "2026-03": 4780596909.038738, "2026-04": 1589305792.7144144, "2026-05": 634404117.4774773}, "PT Advanta Seeds Indonesia": {"2024-11": 13823094853.054052, "2024-12": 2547032943.5765767, "2025-01": 5298705853.387387, "2025-02": 938599480.1891892, "2025-03": 6593377785.295497, "2025-04": 755301776.8018018, "2025-05": 1147118488.3423424, "2025-06": 4839163775.126126, "2025-07": 340004155.6396396, "2025-08": 5304689077.459459, "2025-09": 10897102486.387388, "2025-10": 19627060208.882885, "2025-11": 60512974933.39641, "2025-12": 5755510383.882882, "2026-01": 1851003522.6126127, "2026-02": 1566384709.9909909, "2026-03": 2295937987.4774776, "2026-04": 244968741.7027027}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 8782546852.697159, "2025-01": 3265229375.031688, "2025-02": 2805258028.085951, "2025-03": 4497605185.897712, "2025-04": 2386949003.763153, "2025-05": 1043041204.7393377, "2025-06": 3232855929.5863957, "2025-07": 5834361391.586091, "2025-08": 10681929812.339973, "2025-09": 15718280049.071657, "2025-10": 23416399340.388638, "2025-11": 11762471740.916893, "2025-12": 1547301991.0165136, "2026-01": 539255590.4932972, "2026-02": 1078349249.6065764, "2026-03": 802547073.1198289, "2026-04": 400518223.3091441}, "PT Bayer Indonesia": {"2024-06": 23950017.37, "2024-10": 31816814.28, "2024-11": 127650128.89999999, "2024-12": 8666047472.12, "2025-01": 88086246.30000001, "2025-02": 120473818.50999999, "2025-03": 814804510.6600001, "2025-04": 303975092.88, "2025-05": 331792152.3, "2025-06": 69589.96, "2025-07": 1860553431.8599997, "2025-08": 2172612243.78, "2025-09": 4167867938.8600006, "2025-10": 5672569944.900001, "2025-11": 5179624319.53, "2025-12": 1336740266.53, "2026-03": 43272193.400000006, "2026-04": 419170619.09000003}, "Nuziveedu": {"2023-03": 1631132680.0}, "Bioseed": {"2020-05": 708320700.0, "2020-07": 2493578088.0, "2020-08": 3966095340.0, "2020-09": 1848564072.0, "2020-10": 702480600.0, "2020-11": 1296085050.0, "2020-12": 2083857408.0, "2021-08": 1744027115.6000001, "2021-11": 3559828955.6000004, "2021-12": 2818853281.8, "2022-02": 1886139216.0, "2022-06": 432911942.8, "2022-10": 564233093.6, "2022-11": 203123505.6, "2023-03": 918278609.5999999, "2023-10": 1053329784.0, "2024-11": 3320204584.9549556}}, "Rental": {"PT Sygenta Seed Indonesia": {"2024-09": 777005254.33, "2024-10": 1435789982.4, "2024-11": 1502975049.0800002, "2024-12": 1890735319.6799998, "2025-01": 2629307196.52, "2025-02": 2585242294.36, "2025-03": 2759451744.4, "2025-04": 2639803023.6000004, "2025-05": 2563239852.3999996, "2025-06": 2571778150.0, "2025-07": 2591826993.4, "2025-08": 2691199773.31, "2025-09": 2987948412.65, "2025-10": 2961663187.9, "2025-11": 2826789797.8, "2025-12": 2753367161.0, "2026-01": 2730825173.0, "2026-02": 2753619560.0, "2026-03": 2764691563.8, "2026-04": 2883201204.58}, "PT Advanta Seeds Indonesia": {"2024-09": 10000000.0, "2024-10": 10000000.0, "2024-11": 265028350.0, "2024-12": 217812045.0, "2025-01": 244060545.0, "2025-02": 219497045.0, "2025-03": 1526825195.82, "2025-04": 943723323.18, "2025-05": 929887109.02, "2025-06": 1046960485.23, "2025-07": 1117518869.631, "2025-08": 1015229178.91, "2025-09": 1055385620.89, "2025-10": 1140173029.0, "2025-11": 1859290654.65, "2025-12": 1791470992.5944, "2026-01": 1855500031.5822558, "2026-02": 2078658429.7632961, "2026-03": 2068882269.7260919, "2026-04": 1964200596.61874}, "PT Alam Semesta Agro": {"2025-03": 59205901.120000005, "2025-04": 119978263.85, "2025-05": 82289068.71000001, "2025-06": 90524869.41, "2025-07": 139541600.0, "2025-08": 208800534.0, "2025-09": 206040000.0, "2025-10": 206040000.0, "2025-11": 206040000.0, "2025-12": 206040000.0, "2026-01": 189720000.0, "2026-02": 206040000.0, "2026-03": 206040000.0, "2026-04": 206040000.0}, "PT Corteva Agriscience Seed Indonesia": {"2024-11": 42127575.71, "2024-12": 961180015.8018017, "2025-01": 721414719.9999999, "2025-02": 743923283.0599998, "2025-03": 721414719.9999999, "2025-04": 721414719.9999999, "2025-05": 743923283.0599998, "2025-06": 1834316175.117117, "2025-07": 1068248719.9999999, "2025-08": 1090758053.6899998, "2025-09": 1068248719.9999999, "2025-10": 1493696550.413506, "2025-11": 2023941495.3860724, "2025-12": 1984504875.105441, "2026-01": 1789729515.1438804, "2026-02": 1623840080.56, "2026-03": 1474360851.2536936, "2026-04": 1068248720.0}}}, "service_qty": {"Tooling": {"PT Sygenta Seed Indonesia": {"2024-10": 936997.0, "2024-11": 5128144.0, "2024-12": 2425910.0, "2025-01": 647100.0, "2025-02": 626560.0, "2025-03": 1004360.0, "2025-07": 158888.0, "2025-08": 6700780.0, "2025-09": 8140888.0, "2025-10": 2969880.0, "2025-12": 1147952.0, "2026-01": 750489.0, "2026-02": 1396093.0, "2026-03": 1961806.5, "2026-04": 429773.0, "2026-05": 181615.0}, "PT Advanta Seeds Indonesia": {"2024-11": 4055036.0, "2024-12": 1297014.0, "2025-01": 2068170.0, "2025-02": 376169.0, "2025-03": 2264348.0, "2025-04": 613561.0, "2025-05": 631496.0, "2025-06": 2331982.0, "2025-07": 194289.0, "2025-08": 1902867.0, "2025-09": 3667487.0, "2025-10": 6391558.0, "2025-11": 17235212.5, "2025-12": 2193670.0, "2026-01": 1096048.5, "2026-02": 1477070.0, "2026-03": 1954367.0, "2026-04": 181583.0}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 1632467.65, "2025-01": 770672.88, "2025-02": 1054385.8, "2025-03": 1297606.45, "2025-04": 829456.0, "2025-05": 583421.9, "2025-06": 1116437.132, "2025-07": 1509398.2, "2025-08": 2165495.75, "2025-09": 3551088.6999999997, "2025-10": 4291375.699999999, "2025-11": 2135913.95, "2025-12": 3851062.4000000004, "2026-01": 798177.6399999999, "2026-02": 884994.25, "2026-03": 835595.45, "2026-04": 839722.75}, "PT Bayer Indonesia": {"2024-06": 15143.0, "2024-10": 24493.0, "2024-11": 80710.0, "2024-12": 1237939.0, "2025-01": 36567.0, "2025-02": 25409.0, "2025-03": 438485.0, "2025-04": 163617.0, "2025-05": 49983.0, "2025-06": 44.0, "2025-07": 465974.0, "2025-08": 435992.0, "2025-09": 832723.0, "2025-10": 856205.0, "2025-11": 914500.0, "2025-12": 208873.0, "2026-03": 197260.0, "2026-04": 196433.0}, "Nuziveedu": {"2023-03": 31580.0}, "Bioseed": {"2022-02": 325256.0, "2022-06": 211259.0, "2022-10": 157369.0, "2022-11": 94851.0, "2023-03": 144892.0, "2023-10": 514020.0, "2024-11": 1151500.0}}, "Rental": {"PT Sygenta Seed Indonesia": {"2024-12": 2001472.0, "2025-01": 13402778.0, "2025-02": 13681671.0, "2025-03": 14793689.0, "2025-04": 13201821.0, "2025-05": 11933202.0, "2025-06": 12144068.0, "2025-07": 12369133.5, "2025-08": 13043608.0, "2025-09": 16142751.0, "2025-10": 15837219.0, "2025-11": 13809207.0, "2025-12": 12514937.0, "2026-01": 12440541.0, "2026-02": 12515770.0, "2026-03": 13497998.0, "2026-04": 14303319.0}, "PT Advanta Seeds Indonesia": {"2025-03": 3717530.0, "2025-04": 121362.0, "2025-05": 86118.0, "2025-06": 192936.0, "2025-07": 120375.9, "2025-08": 147453.0, "2025-09": 362932.0, "2025-10": 2579000.0, "2025-11": 174112.0, "2025-12": 122834.0, "2026-01": 177256.83999999997, "2026-02": 5462973.4399999995, "2026-03": 5402267.38, "2026-04": 5243812.1}, "PT Alam Semesta Agro": {"2025-03": 362352.0, "2025-04": 650494.0, "2025-05": 431564.0, "2025-06": 297383.0, "2025-07": 314.0, "2025-08": 121110.0, "2025-09": 510.0, "2025-10": 510.0, "2025-11": 510.0, "2025-12": 510.0, "2026-01": 510.0, "2026-02": 510000.0, "2026-03": 510.0, "2026-04": 510.0}, "PT Corteva Agriscience Seed Indonesia": {"2025-10": 40307877.412, "2025-11": 85676089.14000006, "2025-12": 2784332.0141935484, "2026-01": 2166128.336774195, "2026-02": 8700837.0, "2026-03": 8253280.0, "2026-04": 7000000.0}}}}};
+const data = {"refreshed": "Saturday, 23 May 2026 - 14:51", "refresh_short": "23 May 2026", "current_year": 2026, "kpi": {"total_ar": 50807180164.58422, "tahun_berjalan": 20175546452.029274, "saldo_lama": 30631633712.554955, "tooling": 38613899962.24014, "rental": 12193280202.344078, "billing": 7235612271.351756, "billing_month": "May 2026", "collection": 10412393498.306433, "collection_month": "May 2026", "collection_ytd": 131113230523.26775, "collection_y1": 288569069004.3917, "collection_y2": 743923283.0599998}, "aging_order": ["NOT YET DUE", "0-30", "31-60", "61-90", "91-180", "181-365", ">1 year"], "aging_descriptions": {"NOT YET DUE": "Belum jatuh tempo", "0-30": "Overdue 1-30 hari", "31-60": "Overdue 31-60 hari", "61-90": "Overdue 61-90 hari", "91-180": "Overdue 91-180 hari", "181-365": "Overdue 181-365 hari", ">1 year": "Overdue > 1 tahun"}, "aging_colors": {"NOT YET DUE": "#00B050", "0-30": "#92D050", "31-60": "#FFD966", "61-90": "#F4B084", "91-180": "#ED7D31", "181-365": "#C00000", ">1 year": "#5B0E0E"}, "aging_text_colors": {"NOT YET DUE": "#FFFFFF", "0-30": "#0F172A", "31-60": "#0F172A", "61-90": "#0F172A", "91-180": "#FFFFFF", "181-365": "#FFFFFF", ">1 year": "#FFFFFF"}, "customers": ["PT Sygenta Seed Indonesia", "PT Advanta Seeds Indonesia", "PT Alam Semesta Agro", "PT Corteva Agriscience Seed Indonesia", "PT Bayer Indonesia", "Nuziveedu", "Bioseed"], "aging_rows": [{"customer": "PT Sygenta Seed Indonesia", "buckets": [9709325506.178198, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 9709325506.178198}, {"customer": "PT Advanta Seeds Indonesia", "buckets": [3065595382.9700913, 3228075712.3296957, -298186743.3988662, 281616408.88856226, 6347132.378918919, 0.0, 0.0], "total": 6283447893.168402}, {"customer": "PT Alam Semesta Agro", "buckets": [412080000.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 412080000.0}, {"customer": "PT Corteva Agriscience Seed Indonesia", "buckets": [2548251282.4285135, 684766225.8141532, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 3233017508.2426667}, {"customer": "PT Bayer Indonesia", "buckets": [419170619.09000003, 118504925.35, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 537675544.44}, {"customer": "Nuziveedu", "buckets": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1031722365.0], "total": 1031722365.0}, {"customer": "Bioseed", "buckets": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 29599911347.554955], "total": 29599911347.554955}], "grand_total_buckets": [16154422790.666803, 4031346863.493849, -298186743.3988662, 281616408.88856226, 6347132.378918919, 0.0, 30631633712.554955], "overdue_by_cust": {"PT Sygenta Seed Indonesia": 0.0, "PT Advanta Seeds Indonesia": 3217852510.1983104, "PT Alam Semesta Agro": 0.0, "PT Corteva Agriscience Seed Indonesia": 684766225.8141532, "PT Bayer Indonesia": 118504925.35000001, "Nuziveedu": 1031722365.0, "Bioseed": 29599911347.554955}, "overdue_total": 34652757373.91742, "overdue_label": "May 2026", "proj_sections": [{"label": "May 2026", "rows": [{"date": "24 May 2026", "values": [0.0, 1101104301.3513513, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 1101104301.3513513}, {"date": "26 May 2026", "values": [825500320.1351349, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 825500320.1351349}, {"date": "28 May 2026", "values": [0.0, 0.0, 0.0, 406112131.2536937, 0.0, 0.0, 0.0], "total": 406112131.2536937}, {"date": "30 May 2026", "values": [0.0, 223970887.84874, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 223970887.84874}], "totals": [825500320.1351349, 1325075189.2000914, 0.0, 406112131.2536937, 0.0, 0.0, 0.0], "grand_total": 2556687640.58892}, {"label": "June 2026", "rows": [{"date": "02 Jun 2026", "values": [936954398.671171, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 936954398.671171}, {"date": "04 Jun 2026", "values": [0.0, 0.0, 0.0, 1068248720.0, 0.0, 0.0, 0.0], "total": 1068248720.0}, {"date": "07 Jun 2026", "values": [0.0, 0.0, 412080000.0, 0.0, 0.0, 0.0, 0.0], "total": 412080000.0}, {"date": "09 Jun 2026", "values": [2764691563.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 2764691563.8}, {"date": "11 Jun 2026", "values": [0.0, 0.0, 0.0, 555591360.56, 0.0, 0.0, 0.0], "total": 555591360.56}, {"date": "13 Jun 2026", "values": [223540169.5135135, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 223540169.5135135}, {"date": "15 Jun 2026", "values": [851303739.8918917, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 851303739.8918917}, {"date": "16 Jun 2026", "values": [75268108.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 75268108.8}, {"date": "18 Jun 2026", "values": [0.0, 0.0, 0.0, 285579262.3056757, 0.0, 0.0, 0.0], "total": 285579262.3056757}, {"date": "21 Jun 2026", "values": [152520206.1081081, 1740520193.77, 0.0, 0.0, 419170619.09000003, 0.0, 0.0], "total": 2312211018.968108}, {"date": "25 Jun 2026", "values": [0.0, 0.0, 0.0, 232719808.3091441, 0.0, 0.0, 0.0], "total": 232719808.3091441}, {"date": "30 Jun 2026", "values": [289305486.94144136, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 289305486.94144136}], "totals": [5293583673.726126, 1740520193.77, 412080000.0, 2142139151.1748197, 419170619.09000003, 0.0, 0.0], "grand_total": 10007493637.760946}, {"label": "July 2026", "rows": [{"date": "06 Jul 2026", "values": [2883201204.58, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 2883201204.58}, {"date": "17 Jul 2026", "values": [707040307.7369367, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "total": 707040307.7369367}], "totals": [3590241512.3169365, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "grand_total": 3590241512.3169365}], "service_billing": [{"month": "Jun 2025", "performed": 13615668974.42964, "invoiced": 8393126068.2473545, "gap": 5222542906.182285, "pct_invoiced": 0.6164314132496705, "note": "Many services uninvoiced"}, {"month": "Jul 2025", "performed": 13978232594.40502, "invoiced": 13430086367.517927, "gap": 548146226.8870926, "pct_invoiced": 0.9607857271521941, "note": "On track"}, {"month": "Aug 2025", "performed": 48586290116.633575, "invoiced": 34733261287.44349, "gap": 13853028829.190086, "pct_invoiced": 0.7148778226134314, "note": "Partially uninvoiced"}, {"month": "Sep 2025", "performed": 68255640051.32751, "invoiced": 67971714009.00736, "gap": 283926042.32014465, "pct_invoiced": 0.9958402552213028, "note": "On track"}, {"month": "Oct 2025", "performed": 66793712354.01656, "invoiced": 63827327546.06796, "gap": 2966384807.948601, "pct_invoiced": 0.9555888615349553, "note": "On track"}, {"month": "Nov 2025", "performed": 84371132941.67935, "invoiced": 31245109766.04071, "gap": 53126023175.63864, "pct_invoiced": 0.3703293849051258, "note": "Many services uninvoiced"}, {"month": "Dec 2025", "performed": 15421312930.929237, "invoiced": 86240159201.3014, "gap": -70818846270.37216, "pct_invoiced": 5.592270877814608, "note": "Catch-up: prior-month invoices issued"}, {"month": "Jan 2026", "performed": 9270127141.507723, "invoiced": 13827779290.76451, "gap": -4557652149.256786, "pct_invoiced": 1.4916493678764706, "note": "Catch-up: prior-month invoices issued"}, {"month": "Feb 2026", "performed": 13136105644.05059, "invoiced": 10232991763.920591, "gap": 2903113880.129999, "pct_invoiced": 0.7789973711543015, "note": "Partially uninvoiced"}, {"month": "Mar 2026", "performed": 14436328847.81583, "invoiced": 14795617887.569881, "gap": -359289039.7540512, "pct_invoiced": 1.0248878398061991, "note": "On track"}, {"month": "Apr 2026", "performed": 8775653898.015, "invoiced": 14358678838.518154, "gap": -5583024940.503155, "pct_invoiced": 1.6361947503155294, "note": "Catch-up: prior-month invoices issued"}, {"month": "May 2026", "performed": 634404117.4774773, "invoiced": 7235612271.351756, "gap": -6601208153.874279, "pct_invoiced": 11.40536776482797, "note": "Catch-up: prior-month invoices issued"}], "year_rows": [{"label": "Year 2020 (Jan-Dec)", "year": 2020, "tooling": 13098981258.0, "rental": 0.0, "total": 13098981258.0, "tag": "old"}, {"label": "Year 2021 (Jan-Dec)", "year": 2021, "tooling": 8122709353.000001, "rental": 0.0, "total": 8122709353.000001, "tag": "old"}, {"label": "Year 2022 (Jan-Dec)", "year": 2022, "tooling": 3086407758.0, "rental": 0.0, "total": 3086407758.0, "tag": "old"}, {"label": "Year 2023 (Jan-Dec)", "year": 2023, "tooling": 3003330758.6, "rental": 0.0, "total": 3003330758.6, "tag": "old"}, {"label": "Year 2024 (Jan-Dec)", "year": 2024, "tooling": 3320204584.9549556, "rental": 0.0, "total": 3320204584.9549556, "tag": "old"}, {"label": "Year 2025 (Jan-Dec) — Fully Paid", "year": 2025, "tooling": 0.0, "rental": 0.0, "total": 0.0, "tag": "paid"}, {"label": "Year 2026 (Jan-Dec)", "year": 2026, "tooling": 7982266249.685187, "rental": 12193280202.344078, "total": 20175546452.029266, "tag": "current"}], "year_grand_total": {"tooling": 38613899962.24014, "rental": 12193280202.344078, "total": 50807180164.58422}, "inv_vs_svc": {"month_keys_all": ["2020-05", "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12", "2021-08", "2021-11", "2021-12", "2022-02", "2022-06", "2022-10", "2022-11", "2023-03", "2023-10", "2024-06", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05"], "month_labels_all": ["May 2020", "Jul 2020", "Aug 2020", "Sep 2020", "Oct 2020", "Nov 2020", "Dec 2020", "Aug 2021", "Nov 2021", "Dec 2021", "Feb 2022", "Jun 2022", "Oct 2022", "Nov 2022", "Mar 2023", "Oct 2023", "Jun 2024", "Sep 2024", "Oct 2024", "Nov 2024", "Dec 2024", "Jan 2025", "Feb 2025", "Mar 2025", "Apr 2025", "May 2025", "Jun 2025", "Jul 2025", "Aug 2025", "Sep 2025", "Oct 2025", "Nov 2025", "Dec 2025", "Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026"], "years_available": ["2020", "2021", "2022", "2023", "2024", "2025", "2026"], "invoiced_amount": {"Tooling": {"PT Sygenta Seed Indonesia": {"2024-11": 14955941035.567568, "2024-12": 13517274028.333332, "2025-01": 2063561702.5225224, "2025-02": 830154723.2432432, "2025-03": 4428601379.099099, "2025-06": 491504543.018018, "2025-08": 15189721649.027027, "2025-09": 36927708141.54955, "2025-10": 18348799730.585587, "2025-11": 411896270.2702703, "2026-01": 46377260.8, "2026-02": 4132755614.4054046, "2026-03": 3778925709.9675674, "2026-04": 2528892109.926126, "2026-05": 707040307.7369367}, "PT Advanta Seeds Indonesia": {"2024-11": 13823094853.054052, "2024-12": 2547032943.5765767, "2025-01": 3184056356.5855856, "2025-02": 2319056162.774774, "2025-03": 3906950717.07928, "2025-04": 3366102029.018018, "2025-05": 1147118488.3423424, "2025-06": 186091013.00000003, "2025-07": 4971116300.864865, "2025-08": 5264460186.252252, "2025-09": 10392322771.504505, "2025-10": 20300886772.720722, "2025-11": 11727429.801801803, "2025-12": 60570832135.36037, "2026-01": 7766643367.252254, "2026-02": 330957527.81081086, "2026-03": 1719092359.7657657, "2026-04": 2530489748.4414415}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 8782546852.697159, "2025-02": 3265229375.031688, "2025-03": 2805258028.085951, "2025-04": 4497605185.897712, "2025-05": 2386949003.763153, "2025-06": 1043041204.7393377, "2025-07": 3078854480.2530627, "2025-08": 5834361391.586091, "2025-09": 10835931261.673307, "2025-10": 15718280049.071657, "2025-11": 23416399340.388638, "2025-12": 12320507875.419407, "2026-02": 476716225.7332972, "2026-03": 1015488535.4065764, "2026-04": 1799432161.288153, "2026-05": 518299070.6148198}, "PT Bayer Indonesia": {"2024-12": 842597880.02, "2025-01": 60590599.400000006, "2025-02": 126107350.53, "2025-03": 758248878.57, "2025-04": 96269642.57, "2025-05": 8286902535.930001, "2025-06": 337879366.3, "2025-07": 1606091416.7599998, "2025-08": 1758026367.43, "2025-09": 4809764294.370001, "2025-10": 5685549828.4, "2025-11": 485150200.43, "2025-12": 4710173587.4800005, "2026-01": 1260049308.6, "2026-04": 118504925.35, "2026-05": 419170619.09000003}, "Nuziveedu": {"2023-03": 1631132680.0}, "Bioseed": {"2020-05": 708320700.0, "2020-07": 2493578088.0, "2020-08": 3966095340.0, "2020-09": 1848564072.0, "2020-10": 702480600.0, "2020-11": 1296085050.0, "2020-12": 2083857408.0, "2021-08": 1744027115.6000001, "2021-11": 3559828955.6000004, "2021-12": 2818853281.8, "2022-02": 1886139216.0, "2022-06": 432911942.8, "2022-10": 564233093.6, "2022-11": 203123505.6, "2023-03": 918278609.5999999, "2023-10": 1053329784.0, "2024-12": 3320204584.9549556}}, "Rental": {"PT Sygenta Seed Indonesia": {"2024-10": 648689468.0, "2024-11": 1564105768.73, "2024-12": 2816784099.48, "2025-01": 576926269.28, "2025-02": 2629307196.52, "2025-03": 2585242294.36, "2025-04": 2759451744.4, "2025-05": 2639803023.6000004, "2025-06": 2563239852.3999996, "2025-07": 2571778150.0, "2025-08": 2591826993.4, "2025-09": 2691199773.31, "2025-10": 1444136824.4, "2025-11": 4505474776.15, "2025-12": 2826789797.8, "2026-01": 2753367161.0, "2026-02": 1276640000.0, "2026-03": 4207804733.0, "2026-04": 2764691563.8, "2026-05": 2883201204.58}, "PT Advanta Seeds Indonesia": {"2024-10": 10000000.0, "2024-11": 51870305.0, "2024-12": 440970090.0, "2025-01": 21443500.0, "2025-02": 222617045.0, "2025-03": 219497045.0, "2025-04": 238989264.0, "2025-05": 216288627.0, "2025-06": 2945157737.0199995, "2025-07": 1111721150.23, "2025-08": 1052758204.631, "2025-09": 1015229178.91, "2025-10": 1055385620.89, "2025-11": 1140173029.0, "2025-12": 2080674647.7844, "2026-01": 1795302193.112256, "2026-02": 1849200632.5232959, "2026-03": 2078537034.286092, "2026-04": 2074058758.4587402, "2026-05": 1740229708.77}, "PT Alam Semesta Agro": {"2025-04": 59205901.120000005, "2025-05": 119978263.85, "2025-06": 82289068.71000001, "2025-07": 90524869.41, "2025-08": 139541600.0, "2025-09": 208800534.0, "2025-10": 206040000.0, "2025-11": 206040000.0, "2025-12": 206040000.0, "2026-01": 206040000.0, "2026-02": 189720000.0, "2026-03": 206040000.0, "2026-05": 412080000.0}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 763542295.7099999, "2025-01": 239765295.80180177, "2025-02": 721414719.9999999, "2025-03": 743923283.0599998, "2025-04": 721414719.9999999, "2025-05": 721414719.9999999, "2025-06": 743923283.0599998, "2025-08": 2902564895.117117, "2025-09": 1090758053.6899998, "2025-10": 1068248719.9999999, "2025-11": 1068248719.9999999, "2025-12": 3525141157.4572363, "2026-02": 1977001763.4477835, "2026-03": 1789729515.1438804, "2026-04": 2542609571.2536936, "2026-05": 555591360.56}}}, "invoiced_qty": {"Tooling": {"PT Sygenta Seed Indonesia": {"2024-11": 4475212.0, "2024-12": 4015838.0, "2025-01": 647100.0, "2025-02": 259560.0, "2025-03": 1371360.0, "2025-06": 1.0, "2025-08": 4289035.0, "2025-09": 9118865.0, "2025-10": 4436536.0, "2025-11": 126000.0, "2026-01": 1147952.0, "2026-02": 1885411.0, "2026-03": 1118327.0, "2026-04": 1332165.5, "2026-05": 383873.0}, "PT Advanta Seeds Indonesia": {"2024-11": 4055036.0, "2024-12": 1297014.0, "2025-01": 1315762.0, "2025-02": 899443.0, "2025-03": 1621664.0, "2025-04": 1234563.0, "2025-05": 631496.0, "2025-06": 177147.0, "2025-07": 2337950.0, "2025-08": 1720765.0, "2025-09": 3701324.0, "2025-10": 6638413.0, "2025-11": 2456.0, "2025-12": 17674831.5, "2026-01": 2706025.0, "2026-02": 228135.5, "2026-03": 1564252.0, "2026-04": 2125651.0}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 1632467.65, "2025-02": 770672.88, "2025-03": 1054385.8, "2025-04": 1297606.45, "2025-05": 829456.0, "2025-06": 583421.9, "2025-07": 691997.0, "2025-08": 1509398.2, "2025-09": 2589935.882, "2025-10": 3551088.6999999997, "2025-11": 4291375.699999999, "2025-12": 2452563.35, "2026-02": 523253.63999999996, "2026-03": 607101.75, "2026-04": 4496695.95, "2026-05": 1265851.75}, "PT Bayer Indonesia": {"2024-12": 116662.0, "2025-01": 16567.0, "2025-02": 26514.0, "2025-03": 409347.0, "2025-04": 46858.0, "2025-05": 1402426.0, "2025-06": 53972.0, "2025-07": 305084.0, "2025-08": 524715.0, "2025-09": 902364.0, "2025-10": 852895.0, "2025-11": 224665.0, "2025-12": 696637.0, "2026-01": 176306.0, "2026-04": 228905.0, "2026-05": 196433.0}, "Nuziveedu": {"2023-03": 31580.0}, "Bioseed": {"2022-02": 325256.0, "2022-06": 211259.0, "2022-10": 157369.0, "2022-11": 94851.0, "2023-03": 144892.0, "2023-10": 514020.0, "2024-12": 1151500.0}}, "Rental": {"PT Sygenta Seed Indonesia": {"2025-01": 2001472.0, "2025-02": 13402778.0, "2025-03": 13681671.0, "2025-04": 14793689.0, "2025-05": 13201821.0, "2025-06": 11933202.0, "2025-07": 12144068.0, "2025-08": 12369133.5, "2025-09": 13043608.0, "2025-10": 6799733.0, "2025-11": 25180237.0, "2025-12": 13809207.0, "2026-01": 12514937.0, "2026-02": 4000000.0, "2026-03": 20956311.0, "2026-04": 13497998.0, "2026-05": 14303319.0}, "PT Advanta Seeds Indonesia": {"2025-06": 3925010.0, "2025-07": 192936.0, "2025-08": 120375.9, "2025-09": 147453.0, "2025-10": 362932.0, "2025-11": 2579000.0, "2025-12": 191397.0, "2026-01": 126266.83999999997, "2026-02": 171659.44000000006, "2026-03": 5462971.38, "2026-04": 5406868.1, "2026-05": 5224093.0}, "PT Alam Semesta Agro": {"2025-04": 362352.0, "2025-05": 650494.0, "2025-06": 431564.0, "2025-07": 297383.0, "2025-08": 314.0, "2025-09": 121110.0, "2025-10": 510.0, "2025-11": 510.0, "2025-12": 510.0, "2026-01": 510.0, "2026-02": 510.0, "2026-03": 510000.0, "2026-05": 1020.0}, "PT Corteva Agriscience Seed Indonesia": {"2025-12": 125990966.55200008, "2026-02": 2784332.0141935484, "2026-03": 9159128.336774195, "2026-04": 15253280.0, "2026-05": 1700837.0}}}, "service_amount": {"Tooling": {"PT Sygenta Seed Indonesia": {"2024-10": 3076005807.468468, "2024-11": 17370488227.36937, "2024-12": 8518225572.08108, "2025-01": 2063561702.5225224, "2025-02": 2014027290.8108108, "2025-03": 3244728811.5315313, "2025-07": 1026177432.2882881, "2025-08": 25421071443.144146, "2025-09": 32154766823.468468, "2025-10": 12276110092.531532, "2025-12": 46377260.8, "2026-01": 314093308.6756757, "2026-02": 3829213614.1297293, "2026-03": 4780596909.038738, "2026-04": 1589305792.7144144, "2026-05": 634404117.4774773}, "PT Advanta Seeds Indonesia": {"2024-11": 13823094853.054052, "2024-12": 2547032943.5765767, "2025-01": 5298705853.387387, "2025-02": 938599480.1891892, "2025-03": 6593377785.295497, "2025-04": 755301776.8018018, "2025-05": 1147118488.3423424, "2025-06": 4839163775.126126, "2025-07": 340004155.6396396, "2025-08": 5304689077.459459, "2025-09": 10897102486.387388, "2025-10": 19627060208.882885, "2025-11": 60512974933.39641, "2025-12": 5755510383.882882, "2026-01": 1851003522.6126127, "2026-02": 1566384709.9909909, "2026-03": 2295937987.4774776, "2026-04": 244968741.7027027}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 8782546852.697159, "2025-01": 3265229375.031688, "2025-02": 2805258028.085951, "2025-03": 4497605185.897712, "2025-04": 2386949003.763153, "2025-05": 1043041204.7393377, "2025-06": 3232855929.5863957, "2025-07": 5834361391.586091, "2025-08": 10681929812.339973, "2025-09": 15718280049.071657, "2025-10": 23416399340.388638, "2025-11": 11762471740.916893, "2025-12": 1547301991.0165136, "2026-01": 539255590.4932972, "2026-02": 1078349249.6065764, "2026-03": 802547073.1198289, "2026-04": 400518223.3091441}, "PT Bayer Indonesia": {"2024-06": 23950017.37, "2024-10": 31816814.28, "2024-11": 127650128.89999999, "2024-12": 8666047472.12, "2025-01": 88086246.30000001, "2025-02": 120473818.50999999, "2025-03": 814804510.6600001, "2025-04": 303975092.88, "2025-05": 331792152.3, "2025-06": 69589.96, "2025-07": 1860553431.8599997, "2025-08": 2172612243.78, "2025-09": 4167867938.8600006, "2025-10": 5672569944.900001, "2025-11": 5179624319.53, "2025-12": 1336740266.53, "2026-03": 43272193.400000006, "2026-04": 419170619.09000003}, "Nuziveedu": {"2023-03": 1631132680.0}, "Bioseed": {"2020-05": 708320700.0, "2020-07": 2493578088.0, "2020-08": 3966095340.0, "2020-09": 1848564072.0, "2020-10": 702480600.0, "2020-11": 1296085050.0, "2020-12": 2083857408.0, "2021-08": 1744027115.6000001, "2021-11": 3559828955.6000004, "2021-12": 2818853281.8, "2022-02": 1886139216.0, "2022-06": 432911942.8, "2022-10": 564233093.6, "2022-11": 203123505.6, "2023-03": 918278609.5999999, "2023-10": 1053329784.0, "2024-11": 3320204584.9549556}}, "Rental": {"PT Sygenta Seed Indonesia": {"2024-09": 777005254.33, "2024-10": 1435789982.4, "2024-11": 1502975049.0800002, "2024-12": 1890735319.6799998, "2025-01": 2629307196.52, "2025-02": 2585242294.36, "2025-03": 2759451744.4, "2025-04": 2639803023.6000004, "2025-05": 2563239852.3999996, "2025-06": 2571778150.0, "2025-07": 2591826993.4, "2025-08": 2691199773.31, "2025-09": 2987948412.65, "2025-10": 2961663187.9, "2025-11": 2826789797.8, "2025-12": 2753367161.0, "2026-01": 2730825173.0, "2026-02": 2753619560.0, "2026-03": 2764691563.8, "2026-04": 2883201204.58}, "PT Advanta Seeds Indonesia": {"2024-09": 10000000.0, "2024-10": 10000000.0, "2024-11": 265028350.0, "2024-12": 217812045.0, "2025-01": 244060545.0, "2025-02": 219497045.0, "2025-03": 1526825195.82, "2025-04": 943723323.18, "2025-05": 929887109.02, "2025-06": 1046960485.23, "2025-07": 1117518869.631, "2025-08": 1015229178.91, "2025-09": 1055385620.89, "2025-10": 1140173029.0, "2025-11": 1859290654.65, "2025-12": 1791470992.5944, "2026-01": 1855500031.5822558, "2026-02": 2078658429.7632961, "2026-03": 2068882269.7260919, "2026-04": 1964200596.61874}, "PT Alam Semesta Agro": {"2025-03": 59205901.120000005, "2025-04": 119978263.85, "2025-05": 82289068.71000001, "2025-06": 90524869.41, "2025-07": 139541600.0, "2025-08": 208800534.0, "2025-09": 206040000.0, "2025-10": 206040000.0, "2025-11": 206040000.0, "2025-12": 206040000.0, "2026-01": 189720000.0, "2026-02": 206040000.0, "2026-03": 206040000.0, "2026-04": 206040000.0}, "PT Corteva Agriscience Seed Indonesia": {"2024-11": 42127575.71, "2024-12": 961180015.8018017, "2025-01": 721414719.9999999, "2025-02": 743923283.0599998, "2025-03": 721414719.9999999, "2025-04": 721414719.9999999, "2025-05": 743923283.0599998, "2025-06": 1834316175.117117, "2025-07": 1068248719.9999999, "2025-08": 1090758053.6899998, "2025-09": 1068248719.9999999, "2025-10": 1493696550.413506, "2025-11": 2023941495.3860724, "2025-12": 1984504875.105441, "2026-01": 1789729515.1438804, "2026-02": 1623840080.56, "2026-03": 1474360851.2536936, "2026-04": 1068248720.0}}}, "service_qty": {"Tooling": {"PT Sygenta Seed Indonesia": {"2024-10": 936997.0, "2024-11": 5128144.0, "2024-12": 2425910.0, "2025-01": 647100.0, "2025-02": 626560.0, "2025-03": 1004360.0, "2025-07": 158888.0, "2025-08": 6700780.0, "2025-09": 8140888.0, "2025-10": 2969880.0, "2025-12": 1147952.0, "2026-01": 750489.0, "2026-02": 1396093.0, "2026-03": 1961806.5, "2026-04": 429773.0, "2026-05": 181615.0}, "PT Advanta Seeds Indonesia": {"2024-11": 4055036.0, "2024-12": 1297014.0, "2025-01": 2068170.0, "2025-02": 376169.0, "2025-03": 2264348.0, "2025-04": 613561.0, "2025-05": 631496.0, "2025-06": 2331982.0, "2025-07": 194289.0, "2025-08": 1902867.0, "2025-09": 3667487.0, "2025-10": 6391558.0, "2025-11": 17235212.5, "2025-12": 2193670.0, "2026-01": 1096048.5, "2026-02": 1477070.0, "2026-03": 1954367.0, "2026-04": 181583.0}, "PT Corteva Agriscience Seed Indonesia": {"2024-12": 1632467.65, "2025-01": 770672.88, "2025-02": 1054385.8, "2025-03": 1297606.45, "2025-04": 829456.0, "2025-05": 583421.9, "2025-06": 1116437.132, "2025-07": 1509398.2, "2025-08": 2165495.75, "2025-09": 3551088.6999999997, "2025-10": 4291375.699999999, "2025-11": 2135913.95, "2025-12": 3851062.4000000004, "2026-01": 798177.6399999999, "2026-02": 884994.25, "2026-03": 835595.45, "2026-04": 839722.75}, "PT Bayer Indonesia": {"2024-06": 15143.0, "2024-10": 24493.0, "2024-11": 80710.0, "2024-12": 1237939.0, "2025-01": 36567.0, "2025-02": 25409.0, "2025-03": 438485.0, "2025-04": 163617.0, "2025-05": 49983.0, "2025-06": 44.0, "2025-07": 465974.0, "2025-08": 435992.0, "2025-09": 832723.0, "2025-10": 856205.0, "2025-11": 914500.0, "2025-12": 208873.0, "2026-03": 197260.0, "2026-04": 196433.0}, "Nuziveedu": {"2023-03": 31580.0}, "Bioseed": {"2022-02": 325256.0, "2022-06": 211259.0, "2022-10": 157369.0, "2022-11": 94851.0, "2023-03": 144892.0, "2023-10": 514020.0, "2024-11": 1151500.0}}, "Rental": {"PT Sygenta Seed Indonesia": {"2024-12": 2001472.0, "2025-01": 13402778.0, "2025-02": 13681671.0, "2025-03": 14793689.0, "2025-04": 13201821.0, "2025-05": 11933202.0, "2025-06": 12144068.0, "2025-07": 12369133.5, "2025-08": 13043608.0, "2025-09": 16142751.0, "2025-10": 15837219.0, "2025-11": 13809207.0, "2025-12": 12514937.0, "2026-01": 12440541.0, "2026-02": 12515770.0, "2026-03": 13497998.0, "2026-04": 14303319.0}, "PT Advanta Seeds Indonesia": {"2025-03": 3717530.0, "2025-04": 121362.0, "2025-05": 86118.0, "2025-06": 192936.0, "2025-07": 120375.9, "2025-08": 147453.0, "2025-09": 362932.0, "2025-10": 2579000.0, "2025-11": 174112.0, "2025-12": 122834.0, "2026-01": 177256.83999999997, "2026-02": 5462973.4399999995, "2026-03": 5402267.38, "2026-04": 5243812.1}, "PT Alam Semesta Agro": {"2025-03": 362352.0, "2025-04": 650494.0, "2025-05": 431564.0, "2025-06": 297383.0, "2025-07": 314.0, "2025-08": 121110.0, "2025-09": 510.0, "2025-10": 510.0, "2025-11": 510.0, "2025-12": 510.0, "2026-01": 510.0, "2026-02": 510000.0, "2026-03": 510.0, "2026-04": 510.0}, "PT Corteva Agriscience Seed Indonesia": {"2025-10": 40307877.412, "2025-11": 85676089.14000006, "2025-12": 2784332.0141935484, "2026-01": 2166128.336774195, "2026-02": 8700837.0, "2026-03": 8253280.0, "2026-04": 7000000.0}}}}};
 
 // Currency state and conversion
 const USD_RATE = 17000;   // 1 USD = Rp 17,000 (fixed)
